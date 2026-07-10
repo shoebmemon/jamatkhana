@@ -129,6 +129,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .day.muted:hover{transform:none; box-shadow:none;}
 .day .num{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); }
 .day.is-today .num{ color:var(--teal-dark); font-weight:600; background:var(--gold-soft); border-radius:6px; padding:0 5px; }
+.day.partial{ background:var(--gold-soft); border-color:var(--gold-line); }
 .day.is-booked{ background:var(--gold-mid); border-color:var(--gold); }
 .day.is-booked .num{color:var(--teal-dark); font-weight:600;}
 .day.released{ background:var(--green-soft); border-color:#BFD2C0; }
@@ -142,6 +143,12 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   position:absolute; top:5px; left:6px; font-family:'IBM Plex Mono', monospace;
   font-size:9px; color:var(--teal-dark); opacity:0.7;
 }
+.day-big-dot{
+  display:block; width:12px; height:12px; border-radius:50%; margin:3px 0 0;
+  box-shadow:0 0 0 1.5px rgba(255,255,255,0.7), 0 1px 2px rgba(0,0,0,0.25);
+}
+.day-big-dot.green{ background:#22C55E; }
+.day-big-dot.red{ background:#E11D2E; }
 
 .floor-dots{ display:flex; gap:5px; margin-top:auto; align-self:center; padding-bottom:2px; }
 .floor-dot{
@@ -154,6 +161,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .legend-item{display:flex; align-items:center; gap:6px;}
 .swatch{width:12px; height:12px; border-radius:4px; border:1px solid var(--line);}
 .swatch.available{background:var(--bg);}
+.swatch.partial{background:var(--gold-soft); border-color:var(--gold-line);}
 .swatch.full{background:var(--gold-mid); border-color:var(--gold);}
 .swatch.released{background:var(--green-soft); border-color:#BFD2C0;}
 .legend-dot{width:12px; height:12px; border-radius:50%; box-shadow:0 0 0 1.5px rgba(0,0,0,0.06);}
@@ -199,6 +207,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   border:1px solid var(--line); border-radius:12px; padding:12px 13px; margin-top:12px; background:var(--bg);
 }
 .bc-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+.bc-slot{
+  font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.05em; text-transform:uppercase;
+  background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:2px 9px; color:var(--teal-dark);
+  display:inline-block; margin-bottom:6px;
+}
 .bc-name{font-family:'Marcellus', serif; font-size:16px; color:var(--teal-dark); margin:0 0 2px;}
 .bc-event{font-size:12.5px; color:var(--ink-soft);}
 .bc-pill{
@@ -319,6 +332,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .acct-card.balance-due{border-left-color:var(--rose);}
 .acct-card .num{ font-family:'IBM Plex Mono', monospace; font-size:16.5px; font-weight:600; color:var(--teal-dark); }
 .acct-card .lbl{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.03em; margin-top:4px; }
+
+.item-row{display:flex; gap:8px; align-items:center; margin-top:8px;}
+.item-row:first-child{margin-top:0;}
+.item-row .item-name{flex:2; min-width:0; font-family:'Work Sans', sans-serif; font-size:14px; border:1px solid var(--line); border-radius:9px; padding:9px 11px; background:var(--surface); color:var(--ink);}
+.item-row .item-rate{flex:1; min-width:0; font-family:'Work Sans', sans-serif; font-size:14px; border:1px solid var(--line); border-radius:9px; padding:9px 11px; background:var(--surface); color:var(--ink);}
+.item-row .item-name:focus, .item-row .item-rate:focus{outline:none; border-color:var(--gold);}
+.item-row .item-remove{flex:none; padding:8px 12px; font-size:14px; line-height:1;}
 
 #printArea{display:none;}
 
@@ -448,13 +468,24 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     {id:'first',  key:'bookings-first',  label:'First Floor'},
     {id:'second', key:'bookings-second', label:'Second Floor'}
   ];
+  var SLOTS = [
+    {id:'morning', label:'Morning'},
+    {id:'evening', label:'Evening'},
+    {id:'full', label:'Full Day'}
+  ];
   var EVENT_TYPES = ['Nikah / Wedding','Majlis','Meeting','Birthday / Anniversary','Gyarahvi Sharif','Chaliswa','Other'];
   var WEEKDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
   var state = {
     data: { ground:{}, first:{}, second:{} },
-    settings: { ground:{charge:'',deposit:''}, first:{charge:'',deposit:''}, second:{charge:'',deposit:''} },
+    settings: {
+      slotsEnabled:false,
+      ground:{fullDay:'',halfDay:'',cleaning:'',deposit:''}, first:{fullDay:'',halfDay:'',cleaning:'',deposit:''}, second:{fullDay:'',halfDay:'',cleaning:'',deposit:''},
+      multiFloorDeposit: { two:'', all:'' },
+      rentalItems: [],
+      electricityRate: ''
+    },
     currentFloor: 'ground',
     viewYear: new Date().getFullYear(),
     viewMonth: new Date().getMonth(),
@@ -469,6 +500,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function money(v){ return '₹ ' + num(v).toLocaleString('en-IN'); }
   function escapeHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function attr(v){ return v ? escapeHtml(String(v)) : ''; }
+  function slotsOn(){ return !!(state.settings && state.settings.slotsEnabled); }
+  function slotLabelOf(b){
+    if(!b || !b.slot) return null;
+    var s = SLOTS.find(function(x){ return x.id===b.slot; });
+    return s ? s.label : b.slot;
+  }
+  function payableTotal(b){ return num(b.totalAmount) + num(b.cleaningCharge) + num(b.itemsTotal) + num(b.elecCharge); }
+  function balanceDueOf(b){ return Math.max(payableTotal(b) - num(b.amountPaid), 0); }
 
   // ---------- Storage (Firebase Firestore) ----------
   async function loadAll(){
@@ -480,7 +519,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       results.forEach(function(snap, i){
         var f = FLOORS[i];
         var parsed = (snap && snap.exists) ? (snap.data() || {}) : {};
-        // migrate old single-booking-per-day format to arrays; drop any legacy slot field
+        // migrate old single-booking-per-day format to arrays
         Object.keys(parsed).forEach(function(iso){
           var val = parsed[iso];
           if(val && !Array.isArray(val)){
@@ -511,8 +550,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   }
 
   function defaultSettings(){
-    var s = {};
-    FLOORS.forEach(function(f){ s[f.id] = {charge:'',deposit:''}; });
+    var s = { slotsEnabled:false, multiFloorDeposit:{two:'',all:''}, rentalItems:[], electricityRate:'' };
+    FLOORS.forEach(function(f){ s[f.id] = {fullDay:'',halfDay:'',cleaning:'',deposit:''}; });
     return s;
   }
 
@@ -521,7 +560,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       var snap = await db.collection(BOOKINGS_COLLECTION).doc('settings').get();
       var loaded = (snap && snap.exists) ? (snap.data() || {}) : {};
       var merged = defaultSettings();
-      FLOORS.forEach(function(f){ if(loaded[f.id]) merged[f.id] = loaded[f.id]; });
+      merged.slotsEnabled = !!loaded.slotsEnabled;
+      FLOORS.forEach(function(f){
+        if(loaded[f.id]){
+          var fs = loaded[f.id];
+          // migrate from the older single "charge" field to fullDay
+          if(fs.charge && !fs.fullDay) fs.fullDay = fs.charge;
+          merged[f.id] = { fullDay: fs.fullDay||'', halfDay: fs.halfDay||'', cleaning: fs.cleaning||'', deposit: fs.deposit||'' };
+        }
+      });
+      merged.multiFloorDeposit = {
+        two: (loaded.multiFloorDeposit && loaded.multiFloorDeposit.two) || '',
+        all: (loaded.multiFloorDeposit && loaded.multiFloorDeposit.all) || ''
+      };
+      merged.rentalItems = Array.isArray(loaded.rentalItems) ? loaded.rentalItems : [];
+      merged.electricityRate = loaded.electricityRate || '';
       state.settings = merged;
     }catch(e){
       console.error(e);
@@ -542,8 +595,24 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   }
 
   function dayBookings(floorId, iso){ return (state.data[floorId] && state.data[floorId][iso]) || []; }
+  function takenSlots(list){ return list.map(function(b){ return b.slot || 'full'; }); }
+  function isFullyBooked(list){
+    if(list.length===0) return false;
+    var taken = takenSlots(list);
+    if(taken.indexOf('full') !== -1) return true;
+    return taken.indexOf('morning')!==-1 && taken.indexOf('evening')!==-1;
+  }
+  function availableSlots(list){
+    var taken = takenSlots(list);
+    if(taken.indexOf('full')!==-1) return [];
+    return SLOTS.filter(function(s){
+      if(s.id==='full') return taken.length===0;
+      return taken.indexOf(s.id)===-1;
+    });
+  }
   function isFloorBookedOnDate(floorId, iso, excludeId){
     var list = dayBookings(floorId, iso).filter(function(x){ return !(excludeId && x.id===excludeId); });
+    if(slotsOn()) return isFullyBooked(list);
     return list.length > 0;
   }
 
@@ -580,7 +649,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     function tally(b){
       count++;
       collected += num(b.amountPaid);
-      balanceDue += Math.max(num(b.totalAmount) - num(b.amountPaid), 0);
+      balanceDue += balanceDueOf(b);
       if(!b.sdReleased) depositPending += num(b.sdAmount);
     }
 
@@ -613,10 +682,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         '<div class="legend-item"><span class="legend-dot green"></span>Floor available</div>'+
         '<div class="legend-item"><span class="legend-dot red"></span>Floor booked</div>';
     } else {
-      el.innerHTML =
-        '<div class="legend-item"><span class="swatch available"></span>Available</div>'+
-        '<div class="legend-item"><span class="swatch full"></span>Booked</div>'+
-        '<div class="legend-item"><span class="swatch released"></span>Deposit released</div>';
+      var items = ['<div class="legend-item"><span class="swatch available"></span>Available</div>'];
+      if(slotsOn()) items.push('<div class="legend-item"><span class="swatch partial"></span>One slot booked</div>');
+      items.push('<div class="legend-item"><span class="swatch full"></span>Booked</div>');
+      items.push('<div class="legend-item"><span class="swatch released"></span>Deposit released</div>');
+      el.innerHTML = items.join('');
     }
   }
 
@@ -665,9 +735,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         var html = '<span class="num">'+dayNum+'</span>';
         if(list.length){
           var allReleased = list.every(function(b){ return b.sdReleased; });
-          cell.className += ' is-booked' + (allReleased ? ' released' : '');
+          if(slotsOn()){
+            var full = isFullyBooked(list);
+            cell.className += ' is-booked ' + (full ? '' : 'partial') + (allReleased ? ' released' : '');
+          } else {
+            cell.className += ' is-booked' + (allReleased ? ' released' : '');
+          }
+          if(list.length>1) html += '<span class="count-badge">×'+list.length+'</span>';
           html += '<span class="status-dot"></span>';
-          html += '<span class="name">'+escapeHtml(list[0].name)+'</span>';
+          html += '<span class="name">'+escapeHtml(list[0].name)+(list.length>1?' +'+(list.length-1):'')+'</span>';
         }
         cell.innerHTML = html;
       }
@@ -691,20 +767,26 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function buildReceiptPaperHtml(iso, floorId, b){
     var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
-    var balance = Math.max(num(b.totalAmount)-num(b.amountPaid),0);
+    var balance = balanceDueOf(b);
+    var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' ×'+it.qty; }).join(', ') : '';
     var generatedOn = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
     return '<div class="receipt-paper">'+
       '<div class="rp-head"><p class="rp-title">Jamat Khana Booking Confirmation</p>'+
         '<p class="rp-sub">'+combinedFloorLabel(b, floorId)+'</p></div>'+
       '<p class="rp-ref">Ref '+refCode(b)+'</p>'+
       rpRow('Date', fmtDateLabel(iso)) +
+      (slotLabelOf(b) ? rpRow('Time slot', slotLabelOf(b)) : '') +
       rpRow('Event / purpose', eventLabel||'—') +
       '<div class="rp-divider"></div>'+
       rpRow('Booked by', escapeHtml(b.name)) +
       rpRow('Mobile', escapeHtml(b.mobile), true) +
       rpRow('Address', escapeHtml(b.address)||'—') +
       '<div class="rp-divider"></div>'+
-      rpRow('Total charge', money(b.totalAmount), true) +
+      rpRow('Floor charges', money(b.totalAmount), true) +
+      rpRow('Cleaning charge', money(b.cleaningCharge), true) +
+      (itemsDesc ? rpRow('Items on rent', escapeHtml(itemsDesc)) : '') +
+      (num(b.itemsTotal) ? rpRow('Items total', money(b.itemsTotal), true) : '') +
+      (num(b.elecCharge) ? rpRow('Electricity ('+num(b.elecUnits)+' units)', money(b.elecCharge), true) : '') +
       rpRow('Amount paid', money(b.amountPaid), true) +
       rpRow('Balance due', money(balance), true) +
       rpRow('Security deposit', money(b.sdAmount), true) +
@@ -716,15 +798,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function buildWhatsappText(iso, floorId, b){
     var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
-    var balance = Math.max(num(b.totalAmount)-num(b.amountPaid),0);
+    var balance = balanceDueOf(b);
+    var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' ×'+it.qty; }).join(', ') : '';
     return 'Jamat Khana Booking Confirmation\n'+
       'Ref: '+refCode(b)+'\n\n'+
       'Dear '+b.name+',\n'+
       'Your booking is confirmed:\n\n'+
       'Floor: '+combinedFloorLabel(b, floorId)+'\n'+
       'Date: '+fmtDateLabel(iso)+'\n'+
+      (slotLabelOf(b) ? 'Slot: '+slotLabelOf(b)+'\n' : '')+
       'Event: '+(eventLabel||'—')+'\n\n'+
-      'Total charge: '+money(b.totalAmount)+'\n'+
+      'Floor charges: '+money(b.totalAmount)+'\n'+
+      'Cleaning charge: '+money(b.cleaningCharge)+'\n'+
+      (itemsDesc ? 'Items on rent: '+itemsDesc+'\n' : '')+
+      (num(b.itemsTotal) ? 'Items total: '+money(b.itemsTotal)+'\n' : '')+
+      (num(b.elecCharge) ? 'Electricity ('+num(b.elecUnits)+' units): '+money(b.elecCharge)+'\n' : '')+
       'Amount paid: '+money(b.amountPaid)+'\n'+
       'Balance due: '+money(balance)+'\n'+
       'Security deposit: '+money(b.sdAmount)+'\n\n'+
@@ -787,6 +875,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function renderDayView(iso, floorId){
     var list = dayBookings(floorId, iso);
     var cardsHtml = list.map(function(b){ return bookingCardHtml(b, floorId); }).join('');
+    var full = slotsOn() ? isFullyBooked(list) : (list.length>0);
+    var avail = slotsOn() ? availableSlots(list) : [];
+    var addLabel = (slotsOn() && avail.length) ? '+ Add booking ('+avail.map(function(s){return s.label;}).join(' / ')+' available)' : '+ Add booking';
 
     modalBox.innerHTML =
       '<div class="modal-head">'+
@@ -795,7 +886,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         '<button class="close-btn" id="mClose">&times;</button>'+
       '</div>'+
       (cardsHtml || '<p class="hint">This day is open on '+floorLabel(floorId)+'.</p>')+
-      (list.length===0 ? '<button class="btn add block" id="mAdd">+ Add booking</button>' : '');
+      (full ? (list.length ? '<p class="hint" style="margin-top:14px;">This day is fully booked.</p>' : '') : '<button class="btn add block" id="mAdd">'+addLabel+'</button>');
 
     document.getElementById('mClose').onclick = closeModal;
     var addBtn = document.getElementById('mAdd');
@@ -816,12 +907,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function renderAllFloorsDayView(iso){
     var sectionsHtml = FLOORS.map(function(f){
       var list = dayBookings(f.id, iso);
-      var body = list.length
-        ? list.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('')
-        : '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p><button class="btn add block" id="addAll-'+f.id+'">+ Add booking on '+f.label+'</button>';
+      var full = slotsOn() ? isFullyBooked(list) : (list.length>0);
+      var cardsHtml = list.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('');
+      var openMsg = (!full && list.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p>' : '';
+      var addBtn = full ? '' : '<button class="btn add block" id="addAll-'+f.id+'">+ Add booking on '+f.label+'</button>';
       return '<div style="margin-top:16px;">'+
         '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">'+f.label+'</p>'+
-        body+'</div>';
+        cardsHtml+openMsg+addBtn+'</div>';
     }).join('');
 
     modalBox.innerHTML =
@@ -834,34 +926,33 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
     FLOORS.forEach(function(f){
       var list = dayBookings(f.id, iso);
-      if(list.length===0){
-        var addBtn = document.getElementById('addAll-'+f.id);
-        if(addBtn) addBtn.onclick = function(){ renderFormView(iso, f.id, null); };
-      } else {
-        list.forEach(function(b){
-          var suf = '-af'+f.id;
-          var rcptBtn = document.getElementById('rcpt-'+b.id+suf);
-          var editBtn = document.getElementById('edit-'+b.id+suf);
-          var relBtn = document.getElementById('rel-'+b.id+suf);
-          var cancelBtn = document.getElementById('can-'+b.id+suf);
-          if(rcptBtn) rcptBtn.onclick = function(){ renderReceiptView(iso, f.id, b, false); };
-          if(editBtn) editBtn.onclick = function(){ renderFormView(iso, f.id, b); };
-          if(relBtn) relBtn.onclick = function(){ renderReleaseView(iso, f.id, b); };
-          if(cancelBtn) cancelBtn.onclick = function(){ handleCancelBooking(iso, f.id, b.id); };
-        });
-      }
+      var addBtn = document.getElementById('addAll-'+f.id);
+      if(addBtn) addBtn.onclick = function(){ renderFormView(iso, f.id, null); };
+      list.forEach(function(b){
+        var suf = '-af'+f.id;
+        var rcptBtn = document.getElementById('rcpt-'+b.id+suf);
+        var editBtn = document.getElementById('edit-'+b.id+suf);
+        var relBtn = document.getElementById('rel-'+b.id+suf);
+        var cancelBtn = document.getElementById('can-'+b.id+suf);
+        if(rcptBtn) rcptBtn.onclick = function(){ renderReceiptView(iso, f.id, b, false); };
+        if(editBtn) editBtn.onclick = function(){ renderFormView(iso, f.id, b); };
+        if(relBtn) relBtn.onclick = function(){ renderReleaseView(iso, f.id, b); };
+        if(cancelBtn) cancelBtn.onclick = function(){ handleCancelBooking(iso, f.id, b.id); };
+      });
     });
   }
 
   function bookingCardHtml(b, floorId, idSuffix){
     idSuffix = idSuffix || '';
-    var balance = Math.max(num(b.totalAmount) - num(b.amountPaid), 0);
+    var balance = balanceDueOf(b);
     var eventLabel = b.eventType === 'Other' ? (b.eventTypeOther || 'Other') : b.eventType;
     var floors = bookingFloors(b, floorId);
     var floorsNote = floors.length>1 ? '<div class="bc-event" style="margin-top:2px;">Booked together on: '+floors.map(function(id){return floorLabel(id);}).join(' + ')+'</div>' : '';
+    var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
+    var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' ×'+it.qty; }).join(', ') : '';
     return '<div class="booking-card">'+
       '<div class="bc-head">'+
-        '<div><div class="bc-name">'+escapeHtml(b.name)+'</div>'+
+        '<div>'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
         '<div class="bc-event">'+escapeHtml(eventLabel||'—')+'</div>'+
         floorsNote+
         '</div>'+
@@ -870,7 +961,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       '<div class="bc-rows">'+
         bcRow('Mobile', '<a href="tel:'+attr(b.mobile)+'">'+escapeHtml(b.mobile)+'</a>', true)+
         bcRow('Address', escapeHtml(b.address)||'—')+
-        bcRow('Total charge', money(b.totalAmount), true)+
+        bcRow('Floor charges', money(b.totalAmount), true)+
+        bcRow('Cleaning charge', money(b.cleaningCharge), true)+
+        (itemsDesc ? bcRow('Items on rent', escapeHtml(itemsDesc)) : '')+
+        (num(b.itemsTotal) ? bcRow('Items total', money(b.itemsTotal), true) : '')+
+        (num(b.elecCharge) ? bcRow('Electricity ('+num(b.elecUnits)+' units)', money(b.elecCharge), true) : '')+
         bcRow('Amount paid', money(b.amountPaid), true)+
         bcRow('Balance due', money(balance), true)+
         bcRow('Security deposit', money(b.sdAmount), true)+
@@ -923,9 +1018,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function renderFormView(iso, ctxFloorId, existing){
     var b = existing || {};
     var isEdit = !!existing;
+    var onSlots = slotsOn();
     var selectedFloors = isEdit ? bookingFloors(b, ctxFloorId).slice() : [ctxFloorId];
-    var autoFlags = { total:true, deposit:true };
-    var lastAppliedOverpay = Math.max(num(b.amountPaid) - num(b.totalAmount), 0);
+    var selectedSlot = onSlots ? (isEdit ? (b.slot || 'full') : null) : null;
+    var autoFlags = { total:true, cleaning:true, deposit:true };
+    var baseFloor = num(b.totalAmount);
+    var baseCleaning = num(b.cleaningCharge);
+    var baseDeposit = num(b.sdAmount);
 
     var floorChoiceHtml = FLOORS.map(function(f){
       var sel = selectedFloors.indexOf(f.id)!==-1;
@@ -937,6 +1036,32 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       return '<option value="'+e+'" '+(b.eventType===e?'selected':'')+'>'+e+'</option>';
     }).join('');
 
+    var rentalItemsList = (state.settings && state.settings.rentalItems) || [];
+    var existingItemsQty = {};
+    (b.items||[]).forEach(function(it){ existingItemsQty[it.id] = it.qty; });
+    var itemsFormHtml = rentalItemsList.length ? (
+      '<div class="booking-card" style="margin-top:14px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Items on rent</p>'+
+        rentalItemsList.map(function(it){
+          return '<div class="field" style="margin-top:8px;">'+
+            '<label style="text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;">'+escapeHtml(it.name)+' — ₹'+num(it.rate)+' each</label>'+
+            '<input type="number" class="fItemQty" data-item-id="'+attr(it.id)+'" data-rate="'+num(it.rate)+'" value="'+attr(existingItemsQty[it.id])+'" placeholder="Quantity used" min="0">'+
+          '</div>';
+        }).join('')+
+        '<p class="hint" id="itemsTotalNote" style="margin-top:10px;"></p>'+
+      '</div>'
+    ) : '';
+
+    var elecFormHtml =
+      '<div class="booking-card" style="margin-top:14px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Electricity meter reading</p>'+
+        '<div class="row2">'+
+          '<div class="field" style="margin-top:0;"><label>Opening reading</label><input type="number" id="fElecOpening" value="'+attr(b.elecOpening)+'" placeholder="0"></div>'+
+          '<div class="field" style="margin-top:0;"><label>Closing reading</label><input type="number" id="fElecClosing" value="'+attr(b.elecClosing)+'" placeholder="0"></div>'+
+        '</div>'+
+        '<p class="hint" id="elecChargeNote" style="margin-top:8px;"></p>'+
+      '</div>';
+
     modalBox.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+'</p>'+
@@ -945,44 +1070,140 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       '</div>'+
       '<div class="field"><label>Floor(s)</label><div class="pick-choice" id="floorChoice">'+floorChoiceHtml+'</div>'+
       '<p class="hint" style="margin-top:6px;">Select more than one to book floors together for the same event. Already-booked floors are greyed out.</p></div>'+
+      (onSlots ? '<div class="field"><label>Time slot</label><div class="pick-choice" id="slotChoice"></div></div><p class="err" id="floorSlotWarn" style="display:none;">No common time slot is free across the floors you selected. Try a different combination.</p>' : '')+
       '<div class="field"><label>Event / purpose</label><select id="fEventType">'+eventOptionsHtml+'</select></div>'+
       '<div class="field" id="fEventOtherWrap" style="'+(b.eventType==='Other'?'':'display:none;')+'"><label>Please specify</label><input type="text" id="fEventOther" value="'+attr(b.eventTypeOther)+'" placeholder="Describe the event"></div>'+
       '<div class="field"><label>Name of person booking</label><input type="text" id="fName" value="'+attr(b.name)+'" placeholder="Full name"></div>'+
       '<div class="field"><label>Mobile number</label><input type="tel" id="fMobile" value="'+attr(b.mobile)+'" placeholder="10-digit mobile number"></div>'+
       '<div class="field"><label>Address</label><textarea id="fAddress" rows="2" placeholder="Full address">'+(b.address||'')+'</textarea></div>'+
-      '<div class="row3">'+
-        '<div class="field"><label>Total charge (₹)</label><input type="number" id="fTotalAmount" value="'+attr(b.totalAmount)+'" placeholder="0"></div>'+
-        '<div class="field"><label>Amount paid (₹)</label><input type="number" id="fAmountPaid" value="'+attr(b.amountPaid)+'" placeholder="0"></div>'+
-        '<div class="field"><label>Deposit (₹)</label><input type="number" id="fSdAmount" value="'+attr(b.sdAmount)+'" placeholder="0"></div>'+
+      '<div class="row2">'+
+        '<div class="field" style="margin-top:0;"><label>Floor charges (₹)</label><input type="number" id="fTotalAmount" value="'+attr(b.totalAmount)+'" placeholder="0"></div>'+
+        '<div class="field" style="margin-top:0;"><label>Cleaning charge (₹)</label><input type="number" id="fCleaningCharge" value="'+attr(b.cleaningCharge)+'" placeholder="0"></div>'+
       '</div>'+
-      (isEdit ? '' : '<p class="hint" id="autoFillHint" style="margin-top:6px;">Charge and deposit are filled in from your saved default rates — feel free to adjust.</p>')+
-      '<p class="hint">If the amount paid is more than the total charge, the extra is added to the security deposit automatically.</p>'+
+      itemsFormHtml+
+      elecFormHtml+
+      '<div class="row2" style="margin-top:14px;">'+
+        '<div class="field" style="margin-top:0;"><label>Deposit (₹)</label><input type="number" id="fSdAmount" value="'+attr(b.sdAmount)+'" placeholder="0"></div>'+
+        '<div class="field" style="margin-top:0;"><label>Amount paid (₹)</label><input type="number" id="fAmountPaid" value="'+attr(b.amountPaid)+'" placeholder="0"></div>'+
+      '</div>'+
+      (isEdit ? '' : '<p class="hint" id="autoFillHint" style="margin-top:6px;">Floor charges, cleaning charge, and deposit are filled in from your saved default rates — feel free to adjust.</p>')+
+      '<p class="hint">Amount paid is expected to cover floor charges + cleaning charge + items + electricity + deposit. Extra goes into the deposit. Any shortfall is taken out of the deposit first, then the cleaning charge, then the floor charges — items and electricity charges are always billed in full.</p>'+
       '<p class="balance-note" id="balanceNote"></p>'+
       '<div class="field"><label>Payment details</label><textarea id="fPaymentDetails" rows="2" placeholder="e.g. UPI, cheque no., cash — reference notes">'+(b.paymentDetails||'')+'</textarea></div>'+
-      '<p class="err" id="fErr">Please select at least one available floor and fill in the name and mobile number.</p>'+
+      '<p class="err" id="fErr">Please select at least one available floor'+(onSlots?', a time slot,':'')+' and fill in the name and mobile number.</p>'+
       '<div class="bc-actions">'+
         '<button class="btn ghost" id="mCancelForm">Cancel</button>'+
         '<button class="btn primary" id="mSave">'+(isEdit?'Save changes':'Confirm booking')+'</button>'+
       '</div>';
 
+    function computeAvailForSelectedFloors(){
+      if(selectedFloors.length===0) return [];
+      var perFloorAvailIds = selectedFloors.map(function(fid){
+        var list = dayBookings(fid, iso).filter(function(x){ return !(isEdit && x.id===b.id); });
+        return availableSlots(list).map(function(s){ return s.id; });
+      });
+      return SLOTS.filter(function(s){
+        return perFloorAvailIds.every(function(ids){ return ids.indexOf(s.id)!==-1; });
+      });
+    }
+
+    function computeItemsTotal(){
+      var total = 0;
+      document.querySelectorAll('.fItemQty').forEach(function(inp){
+        var qty = num(inp.value);
+        var rate = num(inp.getAttribute('data-rate'));
+        total += qty*rate;
+      });
+      return total;
+    }
+
+    function computeElecCharge(){
+      var openingEl = document.getElementById('fElecOpening');
+      var closingEl = document.getElementById('fElecClosing');
+      var opening = num(openingEl ? openingEl.value : 0);
+      var closing = num(closingEl ? closingEl.value : 0);
+      var units = Math.max(closing - opening, 0);
+      var rate = num(state.settings && state.settings.electricityRate);
+      return { units: units, charge: units*rate };
+    }
+
+    function updateExtrasNotes(){
+      var itemsNoteEl = document.getElementById('itemsTotalNote');
+      if(itemsNoteEl){
+        var itemsTotalNow = computeItemsTotal();
+        itemsNoteEl.textContent = itemsTotalNow ? ('Items total: '+money(itemsTotalNow)) : '';
+      }
+      var elecNoteEl = document.getElementById('elecChargeNote');
+      if(elecNoteEl){
+        var openingEl = document.getElementById('fElecOpening');
+        var closingEl = document.getElementById('fElecClosing');
+        var hasReading = (openingEl.value.trim()!=='' || closingEl.value.trim()!=='');
+        var elec = computeElecCharge();
+        if(hasReading){
+          elecNoteEl.textContent = elec.units+' unit'+(elec.units===1?'':'s')+' used × '+money(state.settings.electricityRate||0)+' = '+money(elec.charge);
+        } else if(state.settings.electricityRate){
+          elecNoteEl.textContent = 'Rate: '+money(state.settings.electricityRate)+' per unit';
+        } else {
+          elecNoteEl.textContent = 'Set the electricity rate in Settings to calculate this automatically.';
+        }
+      }
+    }
+
     function computeDefaultAmounts(){
-      var total = 0, deposit = 0;
+      var total = 0, cleaning = 0, deposit = 0;
       selectedFloors.forEach(function(fid){
         var s = (state.settings && state.settings[fid]) || {};
-        total += num(s.charge);
+        if(onSlots){
+          if(selectedSlot==='full') total += num(s.fullDay);
+          else if(selectedSlot) total += num(s.halfDay);
+        } else {
+          total += num(s.fullDay);
+        }
+        cleaning += num(s.cleaning);
         deposit += num(s.deposit);
       });
-      return { total: total, deposit: deposit };
+      // If booking multiple floors together, use the discounted deposit rate
+      // set in Settings instead of adding up each floor's individual deposit.
+      var mfd = (state.settings && state.settings.multiFloorDeposit) || {};
+      if(selectedFloors.length === FLOORS.length && mfd.all !== '' && mfd.all != null){
+        deposit = num(mfd.all);
+      } else if(selectedFloors.length === 2 && mfd.two !== '' && mfd.two != null){
+        deposit = num(mfd.two);
+      }
+      return { total: total, cleaning: cleaning, deposit: deposit };
     }
 
     function updateAutoAmounts(){
       if(isEdit) return;
       var totalInput = document.getElementById('fTotalAmount');
+      var cleaningInput = document.getElementById('fCleaningCharge');
       var sdInput = document.getElementById('fSdAmount');
       var defaults = computeDefaultAmounts();
-      if(autoFlags.total) totalInput.value = defaults.total || '';
-      if(autoFlags.deposit) sdInput.value = defaults.deposit || '';
-      updateBalance();
+      if(autoFlags.total){ totalInput.value = defaults.total || ''; baseFloor = defaults.total; }
+      if(autoFlags.cleaning){ cleaningInput.value = defaults.cleaning || ''; baseCleaning = defaults.cleaning; }
+      if(autoFlags.deposit){ sdInput.value = defaults.deposit || ''; baseDeposit = defaults.deposit; }
+      renderInitialNote();
+    }
+
+    function renderSlotChoiceUI(){
+      var availNow = computeAvailForSelectedFloors();
+      if(!availNow.some(function(s){ return s.id===selectedSlot; })){
+        selectedSlot = (availNow.length===1) ? availNow[0].id : null;
+      }
+      document.getElementById('slotChoice').innerHTML = SLOTS.map(function(s){
+        var enabled = availNow.some(function(a){ return a.id===s.id; });
+        var sel = s.id===selectedSlot;
+        return '<div class="pick-opt'+(sel?' selected':'')+(!enabled?' disabled':'')+'" data-slot="'+s.id+'">'+s.label+'</div>';
+      }).join('');
+      document.querySelectorAll('#slotChoice .pick-opt').forEach(function(opt){
+        opt.onclick = function(){
+          if(opt.classList.contains('disabled')) return;
+          selectedSlot = opt.getAttribute('data-slot');
+          renderSlotChoiceUI();
+        };
+      });
+      document.getElementById('floorSlotWarn').style.display = (selectedFloors.length && availNow.length===0) ? 'block' : 'none';
+      updateAutoAmounts();
     }
 
     document.querySelectorAll('#floorChoice .pick-opt').forEach(function(opt){
@@ -998,7 +1219,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
           selectedFloors.push(fid);
           opt.classList.add('selected');
         }
-        updateAutoAmounts();
+        if(onSlots) renderSlotChoiceUI(); else updateAutoAmounts();
       };
     });
 
@@ -1006,41 +1227,94 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     var otherWrap = document.getElementById('fEventOtherWrap');
     eventSelect.onchange = function(){ otherWrap.style.display = eventSelect.value==='Other' ? '' : 'none'; };
 
-    function updateBalance(){
-      var totalInput = document.getElementById('fTotalAmount');
-      var paidInput = document.getElementById('fAmountPaid');
-      var sdInput = document.getElementById('fSdAmount');
-      var total = num(totalInput.value);
-      var paid = num(paidInput.value);
-      var bal = Math.max(total-paid,0);
+    function renderInitialNote(){
+      updateExtrasNotes();
+      var extras = computeItemsTotal() + computeElecCharge().charge;
+      var due = baseFloor + baseCleaning + baseDeposit + extras;
+      var paidRaw = document.getElementById('fAmountPaid').value;
+      if(paidRaw.trim()===''){
+        document.getElementById('balanceNote').innerHTML = 'Amount due (floor charges + cleaning charge + items + electricity + deposit): <b>'+money(due)+'</b>';
+      } else {
+        var bal = Math.max(due - num(paidRaw), 0);
+        document.getElementById('balanceNote').innerHTML = 'Amount due (floor charges + cleaning charge + items + electricity + deposit): <b>'+money(due)+'</b> · Balance due: <b>'+money(bal)+'</b>';
+      }
+    }
 
-      var newOverpay = Math.max(paid-total,0);
-      var delta = newOverpay - lastAppliedOverpay;
-      if(delta !== 0){
-        var current = num(sdInput.value);
-        var next = current + delta;
-        sdInput.value = next > 0 ? next : '';
-        lastAppliedOverpay = newOverpay;
+    function applyPaidAllocation(){
+      updateExtrasNotes();
+      var paidInput = document.getElementById('fAmountPaid');
+      if(paidInput.value.trim()===''){
+        renderInitialNote();
+        return;
+      }
+      var paid = num(paidInput.value);
+      var extras = computeItemsTotal() + computeElecCharge().charge;
+      var floor = baseFloor, cleaning = baseCleaning, deposit = baseDeposit;
+      var expected = floor + cleaning + deposit + extras;
+      var diff = paid - expected;
+      var newFloor = floor, newCleaning = cleaning, newDeposit = deposit;
+      var noteParts = [];
+      var shortfallRemaining = 0;
+
+      if(diff > 0){
+        newDeposit = deposit + diff;
+        noteParts.push(money(diff)+' extra added to deposit');
+      } else if(diff < 0){
+        var short = -diff;
+        var fromDeposit = Math.min(short, deposit); newDeposit = deposit - fromDeposit; short -= fromDeposit;
+        var fromCleaning = Math.min(short, cleaning); newCleaning = cleaning - fromCleaning; short -= fromCleaning;
+        var fromFloor = Math.min(short, floor); newFloor = floor - fromFloor; short -= fromFloor;
+        if(fromDeposit>0) noteParts.push('deposit reduced by '+money(fromDeposit));
+        if(fromCleaning>0) noteParts.push('cleaning charge reduced by '+money(fromCleaning));
+        if(fromFloor>0) noteParts.push('floor charges reduced by '+money(fromFloor));
+        shortfallRemaining = short;
       }
 
-      document.getElementById('balanceNote').innerHTML = 'Balance due: <b>'+money(bal)+'</b>' + (newOverpay>0 ? ' · <b>'+money(newOverpay)+'</b> of the payment above was added to the deposit' : '');
-    }
-    document.getElementById('fTotalAmount').addEventListener('input', function(){ autoFlags.total=false; updateBalance(); });
-    document.getElementById('fAmountPaid').addEventListener('input', updateBalance);
-    document.getElementById('fSdAmount').addEventListener('input', function(){ autoFlags.deposit=false; });
+      document.getElementById('fTotalAmount').value = newFloor || '';
+      document.getElementById('fCleaningCharge').value = newCleaning || '';
+      document.getElementById('fSdAmount').value = newDeposit || '';
 
-    if(!isEdit) updateAutoAmounts();
-    updateBalance();
+      var noteText = noteParts.length ? noteParts.join(', ') : 'covers floor charges, cleaning charge, items, electricity, and deposit exactly';
+      document.getElementById('balanceNote').innerHTML = 'Balance due: <b>'+money(shortfallRemaining)+'</b> · '+noteText;
+    }
+
+    document.getElementById('fTotalAmount').addEventListener('input', function(){ autoFlags.total=false; baseFloor=num(this.value); applyPaidAllocation(); });
+    document.getElementById('fCleaningCharge').addEventListener('input', function(){ autoFlags.cleaning=false; baseCleaning=num(this.value); applyPaidAllocation(); });
+    document.getElementById('fSdAmount').addEventListener('input', function(){ autoFlags.deposit=false; baseDeposit=num(this.value); applyPaidAllocation(); });
+    document.getElementById('fAmountPaid').addEventListener('input', applyPaidAllocation);
+    document.querySelectorAll('.fItemQty').forEach(function(inp){ inp.addEventListener('input', applyPaidAllocation); });
+    var fElecOpeningEl = document.getElementById('fElecOpening');
+    var fElecClosingEl = document.getElementById('fElecClosing');
+    if(fElecOpeningEl) fElecOpeningEl.addEventListener('input', applyPaidAllocation);
+    if(fElecClosingEl) fElecClosingEl.addEventListener('input', applyPaidAllocation);
+
+    if(onSlots) renderSlotChoiceUI();
+    else if(!isEdit) updateAutoAmounts();
+    renderInitialNote();
+
 
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mCancelForm').onclick = function(){ renderDayView(iso, ctxFloorId); };
     document.getElementById('mSave').onclick = async function(){
       var name = document.getElementById('fName').value.trim();
       var mobile = document.getElementById('fMobile').value.trim();
-      if(!name || !mobile || selectedFloors.length===0){
+      if(!name || !mobile || selectedFloors.length===0 || (onSlots && !selectedSlot)){
         document.getElementById('fErr').style.display = 'block';
         return;
       }
+      var itemsRecord = [];
+      rentalItemsList.forEach(function(it){
+        var inp = document.querySelector('.fItemQty[data-item-id="'+it.id+'"]');
+        var qty = inp ? num(inp.value) : 0;
+        if(qty>0) itemsRecord.push({ id: it.id, name: it.name, rate: num(it.rate), qty: qty });
+      });
+      var itemsTotalFinal = itemsRecord.reduce(function(s,it){ return s + it.rate*it.qty; }, 0);
+
+      var elecOpeningVal = document.getElementById('fElecOpening').value.trim();
+      var elecClosingVal = document.getElementById('fElecClosing').value.trim();
+      var elecUnitsFinal = Math.max(num(elecClosingVal) - num(elecOpeningVal), 0);
+      var elecChargeFinal = elecUnitsFinal * num(state.settings.electricityRate);
+
       var record = {
         id: b.id || genId(),
         floors: selectedFloors.slice(),
@@ -1050,13 +1324,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         mobile: mobile,
         address: document.getElementById('fAddress').value.trim(),
         totalAmount: document.getElementById('fTotalAmount').value.trim(),
+        cleaningCharge: document.getElementById('fCleaningCharge').value.trim(),
         amountPaid: document.getElementById('fAmountPaid').value.trim(),
         sdAmount: document.getElementById('fSdAmount').value.trim(),
         paymentDetails: document.getElementById('fPaymentDetails').value.trim(),
+        items: itemsRecord,
+        itemsTotal: itemsTotalFinal,
+        elecOpening: elecOpeningVal,
+        elecClosing: elecClosingVal,
+        elecUnits: elecUnitsFinal,
+        elecCharge: elecChargeFinal,
         sdReleased: b.sdReleased || false,
         sdReleaseDate: b.sdReleaseDate || '',
         sdReleaseNotes: b.sdReleaseNotes || ''
       };
+      if(onSlots) record.slot = selectedSlot;
 
       var previousFloors = isEdit ? bookingFloors(b, ctxFloorId) : [];
       var toRemoveFrom = previousFloors.filter(function(f){ return record.floors.indexOf(f)===-1; });
@@ -1202,7 +1484,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     resultsEl.innerHTML = matches.map(function(item){
       return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
         '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+escapeHtml(item.b.mobile)+'</div></div>'+
-        '<div class="sr-right">'+fmtDateLabel(item.iso).split(',')[0]+', '+item.iso.slice(0,4)+'<br>'+item.floorLabel+'</div>'+
+        '<div class="sr-right">'+fmtDateLabel(item.iso).split(',')[0]+', '+item.iso.slice(0,4)+'<br>'+item.floorLabel+(slotLabelOf(item.b)?' · '+slotLabelOf(item.b):'')+'</div>'+
       '</div>';
     }).join('');
     resultsEl.querySelectorAll('.search-result').forEach(function(row){
@@ -1259,12 +1541,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function dayLookupCardHtml(floorId, iso, b){
     var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
-    var balance = Math.max(num(b.totalAmount)-num(b.amountPaid),0);
+    var balance = balanceDueOf(b);
     var floors = bookingFloors(b, floorId);
     var floorsNote = floors.length>1 ? ' · with '+floors.filter(function(id){return id!==floorId;}).map(function(id){return floorLabel(id);}).join(' + ') : '';
+    var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
     return '<div class="booking-card" style="margin-top:8px;">'+
       '<div class="bc-head">'+
-        '<div><div class="bc-name">'+escapeHtml(b.name)+'</div>'+
+        '<div>'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
         '<div class="bc-event">'+escapeHtml(eventLabel||'—')+' · '+escapeHtml(b.mobile)+floorsNote+'</div></div>'+
         '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Released':'Pending')+'</span>'+
       '</div>'+
@@ -1305,10 +1588,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       all.map(function(item){
         var b = item.b;
         var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
-        var balance = Math.max(num(b.totalAmount)-num(b.amountPaid),0);
+        var balance = balanceDueOf(b);
         return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
           '<div class="sr-left"><div class="n">'+escapeHtml(b.name)+'</div><div class="m">'+escapeHtml(b.mobile)+' · '+escapeHtml(eventLabel||'')+'</div></div>'+
-          '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+
+          '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+(slotLabelOf(b)?' · '+slotLabelOf(b):'')+
           '<br><span class="bc-pill '+(b.sdReleased?'released':'pending')+'" style="margin-top:4px;display:inline-block;">'+money(balance)+' due</span></div>'+
         '</div>';
       }).join('');
@@ -1338,7 +1621,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       var eventLabel = item.b.eventType==='Other' ? (item.b.eventTypeOther||'Other') : item.b.eventType;
       return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
         '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+escapeHtml(eventLabel||'')+'</div></div>'+
-        '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+'</div>'+
+        '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+(slotLabelOf(item.b)?' · '+slotLabelOf(item.b):'')+'</div>'+
       '</div>';
     }).join('');
     panel.querySelectorAll('.search-result').forEach(function(row){
@@ -1367,7 +1650,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       totalReceived += num(b.amountPaid);
       sdCollected += num(b.sdAmount);
       if(b.sdReleased) sdReleased += num(b.sdAmount);
-      balanceDue += Math.max(num(b.totalAmount)-num(b.amountPaid),0);
+      balanceDue += balanceDueOf(b);
     });
     var sdHeld = sdCollected - sdReleased;
     return {
@@ -1450,34 +1733,114 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   }
 
   function renderSettingsPanel(panel){
+    var on = slotsOn();
+    var mfd = (state.settings && state.settings.multiFloorDeposit) || {};
+    var workingItems = ((state.settings && state.settings.rentalItems) || []).map(function(it){ return { id: it.id, name: it.name, rate: it.rate }; });
+
     panel.innerHTML =
-      '<p class="hint" style="margin-top:0;">Set the usual charge and deposit for each floor. New bookings will fill these in automatically based on the floor(s) chosen — you can still adjust any individual booking.</p>'+
+      '<div class="booking-card" style="margin-top:0;">'+
+        '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">'+
+          '<input type="checkbox" id="setSlotsEnabled" '+(on?'checked':'')+' style="width:18px;height:18px;margin-top:2px;accent-color:var(--teal);flex:none;">'+
+          '<span><b style="color:var(--teal-dark);">Enable Morning / Evening / Full Day time slots</b><br>'+
+          '<span class="hint" style="margin:2px 0 0;display:block;">Off by default — each floor takes one full-day booking per date. Turn this on if you ever need to split a day into morning and evening functions.</span></span>'+
+        '</label>'+
+      '</div>'+
       FLOORS.map(function(f){
         var s = state.settings[f.id] || {};
         return '<div class="booking-card" style="margin-top:10px;">'+
           '<p class="bc-name" style="margin:0 0 8px;">'+f.label+'</p>'+
           '<div class="row2">'+
-            '<div class="field" style="margin-top:0;"><label>Booking charge (₹)</label><input type="number" id="set-'+f.id+'-charge" value="'+attr(s.charge)+'" placeholder="0"></div>'+
+            '<div class="field" style="margin-top:0;"><label id="lbl-fullDay-'+f.id+'">'+(on?'Full day (₹)':'Booking charge (₹)')+'</label><input type="number" id="set-'+f.id+'-fullDay" value="'+attr(s.fullDay)+'" placeholder="0"></div>'+
+            '<div class="field half-day-field" id="halfDayWrap-'+f.id+'" style="margin-top:0;'+(on?'':'display:none;')+'"><label>Half day (₹)</label><input type="number" id="set-'+f.id+'-halfDay" value="'+attr(s.halfDay)+'" placeholder="0"></div>'+
+          '</div>'+
+          '<div class="row2" style="margin-top:10px;">'+
+            '<div class="field" style="margin-top:0;"><label>Cleaning charge (₹)</label><input type="number" id="set-'+f.id+'-cleaning" value="'+attr(s.cleaning)+'" placeholder="0"></div>'+
             '<div class="field" style="margin-top:0;"><label>Deposit (₹)</label><input type="number" id="set-'+f.id+'-deposit" value="'+attr(s.deposit)+'" placeholder="0"></div>'+
           '</div>'+
         '</div>';
       }).join('')+
-      '<button class="btn primary block" id="saveSettingsBtn">Save default charges</button>'+
-      '<p class="hint">When a booking covers more than one floor, each floor\u2019s rate is added together for the default total.</p>';
+      '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 4px;">Multi-floor deposit</p>'+
+        '<p class="hint" style="margin:0 0 10px;">When a booking covers two floors, or all three floors together, use these lower deposit amounts instead of adding up each floor\u2019s individual deposit. Leave a box blank to keep adding the floors\u2019 deposits together as before.</p>'+
+        '<div class="row2">'+
+          '<div class="field" style="margin-top:0;"><label>Any 2 floors together (₹)</label><input type="number" id="set-mfd-two" value="'+attr(mfd.two)+'" placeholder="e.g. 5000"></div>'+
+          '<div class="field" style="margin-top:0;"><label>All 3 floors together (₹)</label><input type="number" id="set-mfd-all" value="'+attr(mfd.all)+'" placeholder="e.g. 5000"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Items on rent</p>'+
+        '<p class="hint" style="margin:0 0 10px;">Add items like chairs, tables, and blankets with a rate per piece. These show up on the booking form so you can add the quantity used, and the total is added to the final bill.</p>'+
+        '<div id="rentalItemsList"></div>'+
+        '<button type="button" class="btn ghost" id="addItemBtn" style="margin-top:10px;">+ Add item</button>'+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Electricity</p>'+
+        '<div class="field" style="margin-top:0;"><label>Rate per unit (₹)</label><input type="number" id="set-elecRate" value="'+attr(state.settings.electricityRate)+'" placeholder="e.g. 8"></div>'+
+        '<p class="hint" style="margin:8px 0 0;">Used with the opening and closing meter readings entered on each booking to calculate the electricity charge automatically.</p>'+
+      '</div>'+
+      '<button class="btn primary block" id="saveSettingsBtn">Save settings</button>'+
+      '<p class="hint">When time slots are on, Half day rate applies to Morning and Evening bookings, and Full day blocks the whole date. Cleaning charge is added on top of the booking charge as a separate line. When a booking covers more than one floor, each floor\u2019s rates are added together for the default total, unless overridden by the multi-floor deposit above.</p>';
+
+    function itemRowHtml(item, idx){
+      return '<div class="item-row" data-idx="'+idx+'">'+
+        '<input type="text" class="item-name" placeholder="Item name (e.g. Chair)" value="'+attr(item.name)+'">'+
+        '<input type="number" class="item-rate" placeholder="Rate ₹" value="'+attr(item.rate)+'">'+
+        '<button type="button" class="btn danger item-remove" title="Remove item">&times;</button>'+
+      '</div>';
+    }
+
+    function renderRentalItemsList(){
+      var el = document.getElementById('rentalItemsList');
+      el.innerHTML = workingItems.length ? workingItems.map(itemRowHtml).join('') : '<p class="hint" style="margin:0;">No items added yet.</p>';
+      el.querySelectorAll('.item-row').forEach(function(row){
+        var idx = parseInt(row.getAttribute('data-idx'),10);
+        row.querySelector('.item-name').addEventListener('input', function(){ workingItems[idx].name = this.value; });
+        row.querySelector('.item-rate').addEventListener('input', function(){ workingItems[idx].rate = this.value; });
+        row.querySelector('.item-remove').onclick = function(){ workingItems.splice(idx,1); renderRentalItemsList(); };
+      });
+    }
+    renderRentalItemsList();
+
+    document.getElementById('addItemBtn').onclick = function(){
+      workingItems.push({ id: genId(), name:'', rate:'' });
+      renderRentalItemsList();
+    };
+
+    document.getElementById('setSlotsEnabled').onchange = function(){
+      var checked = this.checked;
+      FLOORS.forEach(function(f){
+        document.getElementById('halfDayWrap-'+f.id).style.display = checked ? '' : 'none';
+        document.getElementById('lbl-fullDay-'+f.id).textContent = checked ? 'Full day (₹)' : 'Booking charge (₹)';
+      });
+    };
 
     document.getElementById('saveSettingsBtn').onclick = async function(){
-      var newSettings = {};
+      var newSettings = { slotsEnabled: document.getElementById('setSlotsEnabled').checked };
       FLOORS.forEach(function(f){
         newSettings[f.id] = {
-          charge: document.getElementById('set-'+f.id+'-charge').value.trim(),
+          fullDay: document.getElementById('set-'+f.id+'-fullDay').value.trim(),
+          halfDay: document.getElementById('set-'+f.id+'-halfDay').value.trim(),
+          cleaning: document.getElementById('set-'+f.id+'-cleaning').value.trim(),
           deposit: document.getElementById('set-'+f.id+'-deposit').value.trim()
         };
       });
+      newSettings.multiFloorDeposit = {
+        two: document.getElementById('set-mfd-two').value.trim(),
+        all: document.getElementById('set-mfd-all').value.trim()
+      };
+      newSettings.rentalItems = workingItems
+        .filter(function(it){ return (it.name||'').trim()!==''; })
+        .map(function(it){ return { id: it.id || genId(), name: (it.name||'').trim(), rate: (it.rate!=null?String(it.rate).trim():'') }; });
+      newSettings.electricityRate = document.getElementById('set-elecRate').value.trim();
+
       var btn = document.getElementById('saveSettingsBtn');
       btn.textContent = 'Saving…';
       var ok = await saveSettings(newSettings);
-      btn.textContent = ok ? 'Saved ✓' : 'Save default charges';
-      if(ok) setTimeout(function(){ btn.textContent = 'Save default charges'; }, 1500);
+      btn.textContent = ok ? 'Saved ✓' : 'Save settings';
+      if(ok){
+        renderCalendar();
+        setTimeout(function(){ btn.textContent = 'Save settings'; }, 1500);
+      }
     };
   }
 
@@ -1490,16 +1853,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function downloadCsv(){
     var rows = [[
-      'Floor','Date','Event','Name','Mobile','Address','Total Charge','Amount Paid','Balance Due',
+      'Floor','Date','Slot','Event','Name','Mobile','Address','Floor Charges','Cleaning Charge','Items Rented','Items Total',
+      'Electricity Units','Electricity Charge','Amount Paid','Balance Due',
       'Security Deposit','Payment Details','Deposit Released','Release Date','Release Notes'
     ]];
     uniqueBookingsFlat().sort(function(a,b){ return a.iso.localeCompare(b.iso); }).forEach(function(item){
       var b = item.b;
       var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : (b.eventType||'');
-      var balance = Math.max(num(b.totalAmount)-num(b.amountPaid),0);
+      var balance = balanceDueOf(b);
+      var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' x'+it.qty; }).join(', ') : '';
       rows.push([
-        item.floorLabel, item.iso, eventLabel, b.name, b.mobile, b.address||'',
-        num(b.totalAmount), num(b.amountPaid), balance, num(b.sdAmount), b.paymentDetails||'',
+        item.floorLabel, item.iso, slotLabelOf(b)||'', eventLabel, b.name, b.mobile, b.address||'',
+        num(b.totalAmount), num(b.cleaningCharge), itemsDesc, num(b.itemsTotal),
+        num(b.elecUnits), num(b.elecCharge), num(b.amountPaid), balance, num(b.sdAmount), b.paymentDetails||'',
         b.sdReleased?'Yes':'No', b.sdReleaseDate||'', b.sdReleaseNotes||''
       ]);
     });
