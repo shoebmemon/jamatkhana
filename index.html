@@ -35,14 +35,14 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-.app{ max-width:960px; margin:0 auto; padding:clamp(14px,4vw,36px); width:100%; }
+.app{ max-width:960px; margin:0 auto; padding:clamp(10px,3vw,36px); width:100%; }
 
 /* ---------- Header ---------- */
 .header{
   position:relative;
   background:linear-gradient(160deg,var(--teal) 0%, var(--teal-dark) 100%);
   border-radius:18px;
-  padding:clamp(20px,4vw,32px) clamp(20px,5vw,36px);
+  padding:clamp(16px,4vw,32px) clamp(16px,5vw,36px);
   color:#F7F3E8; overflow:hidden; box-shadow:var(--shadow);
 }
 .header::before{
@@ -57,24 +57,24 @@ body{
   font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.14em;
   text-transform:uppercase; color:var(--gold); opacity:0.9; margin:0 0 4px;
 }
-h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; font-weight:400; letter-spacing:0.01em; }
+h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; font-weight:400; letter-spacing:0.01em; }
 .subtitle{margin:6px 0 0; font-size:13.5px; color:#D9E3DE; opacity:0.85;}
 
 .header-actions{position:relative; display:flex; gap:8px; flex-wrap:wrap;}
 .icon-btn{
-  display:flex; align-items:center; gap:7px;
+  display:flex; align-items:center; justify-content:center; gap:7px;
   font-family:'Work Sans', sans-serif; font-weight:600; font-size:13px;
-  padding:9px 14px; border-radius:10px; border:1px solid rgba(247,243,232,0.28);
-  background:rgba(247,243,232,0.1); color:#F1EDE0; cursor:pointer;
+  padding:12px 14px; border-radius:10px; border:1px solid rgba(247,243,232,0.28);
+  background:rgba(247,243,232,0.1); color:#F1EDE0; cursor:pointer; min-height:44px;
 }
 .icon-btn:hover{background:rgba(247,243,232,0.2);}
 
 .floor-row{ display:flex; gap:8px; margin-top:22px; flex-wrap:wrap; position:relative; }
 .floor-tab{
   font-family:'Work Sans', sans-serif; font-weight:600; font-size:13.5px;
-  padding:9px 16px; border-radius:999px; border:1px solid rgba(247,243,232,0.25);
+  padding:10px 16px; border-radius:999px; border:1px solid rgba(247,243,232,0.25);
   background:rgba(247,243,232,0.08); color:#EDE7D4; cursor:pointer;
-  display:flex; align-items:center; gap:7px;
+  display:flex; align-items:center; gap:7px; min-height:40px;
   transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .floor-tab .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0.6;}
@@ -83,22 +83,22 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
 /* ---------- Card / Calendar ---------- */
 .card{
-  background:var(--surface); border-radius:18px; margin-top:18px;
-  padding:clamp(16px,3vw,28px); box-shadow:var(--shadow); border:1px solid var(--line);
+  background:var(--surface); border-radius:18px; margin-top:14px;
+  padding:clamp(12px,3vw,28px); box-shadow:var(--shadow); border:1px solid var(--line);
 }
 .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; flex-wrap:wrap; }
 .month-label{ font-family:'Marcellus', serif; font-size:20px; color:var(--teal-dark); }
 .nav-group{display:flex; align-items:center; gap:6px;}
 .nav-btn{
-  width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:var(--bg);
-  color:var(--teal-dark); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  width:40px; height:40px; border-radius:10px; border:1px solid var(--line); background:var(--bg);
+  color:var(--teal-dark); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
   transition:background 0.15s ease;
 }
 .nav-btn:hover{background:var(--gold-soft);}
 .today-btn{
   font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase;
-  border:1px solid var(--line); background:var(--bg); color:var(--ink-soft); border-radius:10px; padding:0 12px;
-  height:34px; cursor:pointer;
+  border:1px solid var(--line); background:var(--bg); color:var(--ink-soft); border-radius:10px; padding:0 14px;
+  height:40px; cursor:pointer; display:flex; align-items:center;
 }
 .today-btn:hover{color:var(--teal-dark); border-color:var(--gold);}
 
@@ -109,8 +109,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .summary-cell{
   background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
 }
-.summary-cell .num{ font-family:'IBM Plex Mono', monospace; font-size:16px; font-weight:600; color:var(--teal-dark); }
-.summary-cell .lbl{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
+.summary-cell .num{ font-family:'IBM Plex Mono', monospace; font-size:15px; font-weight:600; color:var(--teal-dark); word-break:break-word; }
+.summary-cell .lbl{ font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
 
 .weekdays{
   display:grid; grid-template-columns:repeat(7,1fr); font-family:'IBM Plex Mono', monospace;
@@ -132,64 +132,57 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .day.partial{ background:var(--gold-soft); border-color:var(--gold-line); }
 .day.is-booked{ background:var(--gold-mid); border-color:var(--gold); }
 .day.is-booked .num{color:var(--teal-dark); font-weight:600;}
-.day.released{ background:var(--green-soft); border-color:#BFD2C0; }
+.day.past-highlight{ background:var(--green-soft); border-color:#BFD2C0; }
+.day.past-highlight .num{ color:var(--teal-dark); }
 .day .name{
   margin-top:auto; font-size:10px; font-weight:600; color:var(--teal-dark);
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
 }
-.day .status-dot{ position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--rose); }
-.day.released .status-dot{background:var(--green);}
 .day .count-badge{
   position:absolute; top:5px; left:6px; font-family:'IBM Plex Mono', monospace;
   font-size:9px; color:var(--teal-dark); opacity:0.7;
 }
-.day-big-dot{
-  display:block; width:12px; height:12px; border-radius:50%; margin:3px 0 0;
-  box-shadow:0 0 0 1.5px rgba(255,255,255,0.7), 0 1px 2px rgba(0,0,0,0.25);
-}
-.day-big-dot.green{ background:#22C55E; }
-.day-big-dot.red{ background:#E11D2E; }
 
-.floor-dots{ display:flex; gap:5px; margin-top:auto; align-self:center; padding-bottom:2px; }
+.floor-dots{ display:flex; gap:4px; margin-top:auto; align-self:center; padding-bottom:2px; flex-wrap:wrap; justify-content:center; }
 .floor-dot{
-  width:12px; height:12px; border-radius:50%; box-shadow:0 0 0 1.5px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.25);
+  width:7px; height:7px; border-radius:50%; box-shadow:0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.25);
 }
 .floor-dot.green{ background:#22C55E; }
 .floor-dot.red{ background:#E11D2E; }
 
-.legend{ display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; font-size:12px; color:var(--ink-soft); }
+.legend{ display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; font-size:12px; color:var(--ink-soft); }
 .legend-item{display:flex; align-items:center; gap:6px;}
 .swatch{width:12px; height:12px; border-radius:4px; border:1px solid var(--line);}
 .swatch.available{background:var(--bg);}
 .swatch.partial{background:var(--gold-soft); border-color:var(--gold-line);}
 .swatch.full{background:var(--gold-mid); border-color:var(--gold);}
-.swatch.released{background:var(--green-soft); border-color:#BFD2C0;}
-.legend-dot{width:12px; height:12px; border-radius:50%; box-shadow:0 0 0 1.5px rgba(0,0,0,0.06);}
-.legend-dot.green{background:#22C55E;}
-.legend-dot.red{background:#E11D2E;}
+.swatch.past{background:var(--green-soft); border-color:#BFD2C0;}
 
 /* ---------- Overlay / Modal (shared) ---------- */
 .overlay{
-  position:fixed; inset:0; background:rgba(10,25,25,0.45); display:none;
-  align-items:center; justify-content:center; padding:18px; z-index:50;
+  position:fixed; inset:0; background:rgba(10,25,25,0.55); display:none;
+  align-items:flex-end; justify-content:center; z-index:50;
 }
 .overlay.show{display:flex;}
 .modal{
-  background:var(--surface); border-radius:16px; max-width:480px; width:100%;
-  max-height:88vh; overflow-y:auto; padding:24px 24px 20px; box-shadow:0 24px 60px rgba(10,25,25,0.35);
+  background:var(--surface); border-radius:20px 20px 0 0; max-width:480px; width:100%;
+  max-height:92vh; overflow-y:auto; padding:24px 16px 40px; box-shadow:0 -10px 40px rgba(10,25,25,0.25);
+  animation: slideUp 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94);
 }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
 .modal.wide{max-width:600px;}
-.modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:4px;}
+.modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
 .modal-date{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px; }
 .modal-title{font-family:'Marcellus', serif; font-size:19px; color:var(--teal-dark); margin:0;}
-.close-btn{ background:none; border:none; font-size:20px; color:var(--ink-soft); cursor:pointer; line-height:1; padding:2px 4px; }
+.close-btn{ background:none; border:none; font-size:28px; color:var(--ink-soft); cursor:pointer; line-height:1; padding:4px 12px; min-height:44px; display:flex; align-items:center; }
 .close-btn:hover{color:var(--ink);}
 
 .field{margin-top:14px;}
 .field label{ display:block; font-size:11.5px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
 .field input, .field textarea, .field select{
   width:100%; font-family:'Work Sans', sans-serif; font-size:16px; border:1px solid var(--line);
-  border-radius:9px; padding:9px 11px; background:var(--bg); color:var(--ink); resize:vertical;
+  border-radius:9px; padding:12px 11px; background:var(--bg); color:var(--ink); resize:vertical; min-height:44px;
 }
 .field input:focus, .field textarea:focus, .field select:focus{ outline:none; border-color:var(--gold); background:#fff; }
 .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
@@ -197,14 +190,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
 .pick-choice{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
 .pick-opt{
-  flex:1; min-width:100px; text-align:center; padding:10px 8px; border-radius:10px; border:1px solid var(--line);
-  background:var(--bg); font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink-soft);
+  flex:1; min-width:100px; text-align:center; padding:12px 8px; border-radius:10px; border:1px solid var(--line);
+  background:var(--bg); font-size:13px; font-weight:600; cursor:pointer; color:var(--ink-soft); min-height:44px; display:flex; align-items:center; justify-content:center;
 }
 .pick-opt.selected{ border-color:var(--gold); background:var(--gold-soft); color:var(--teal-dark); }
 .pick-opt.disabled{ opacity:0.4; cursor:not-allowed; text-decoration:line-through; }
 
 .booking-card{
-  border:1px solid var(--line); border-radius:12px; padding:12px 13px; margin-top:12px; background:var(--bg);
+  border:1px solid var(--line); border-radius:12px; padding:14px; margin-top:12px; background:var(--bg);
 }
 .bc-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
 .bc-slot{
@@ -221,20 +214,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .bc-pill.pending{background:var(--gold-soft); color:#7A5B14; border:1px solid var(--gold-line);}
 .bc-pill.released{background:var(--green-soft); color:var(--green); border:1px solid #BFD2C0;}
 .bc-rows{margin-top:8px;}
-.bc-row{display:flex; justify-content:space-between; font-size:12.5px; padding:4px 0; border-bottom:1px solid var(--line);}
+.bc-row{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--line); gap:10px;}
 .bc-row:last-child{border-bottom:none;}
-.bc-row .k{color:var(--ink-soft);}
-.bc-row .v{font-weight:600; text-align:right;}
+.bc-row .k{color:var(--ink-soft); flex-shrink:0;}
+.bc-row .v{font-weight:600; text-align:right; word-break:break-word;}
 .bc-row .v.mono{font-family:'IBM Plex Mono', monospace; font-weight:500;}
-.bc-row a{color:var(--teal); text-decoration:none;}
+.bc-row a{color:var(--teal); text-decoration:none; padding:4px 0; display:inline-block;}
 .bc-row a:hover{text-decoration:underline;}
-.bc-actions{display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;}
+.bc-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
 
 .btn{
   font-family:'Work Sans', sans-serif; font-weight:600; font-size:13px;
-  padding:8px 13px; border-radius:9px; border:1px solid transparent; cursor:pointer; text-align:center;
+  padding:12px 14px; border-radius:9px; border:1px solid transparent; cursor:pointer; text-align:center;
+  min-height:44px; display:inline-flex; align-items:center; justify-content:center; flex:1; min-width:80px;
 }
-.btn.block{display:block; width:100%; margin-top:14px; padding:11px 14px; font-size:13.5px;}
+.btn.block{display:flex; width:100%; margin-top:14px; padding:12px; font-size:14px;}
 .btn.primary{background:var(--teal); color:#fff;}
 .btn.primary:hover{background:var(--teal-dark);}
 .btn.ghost{background:var(--surface); color:var(--ink); border-color:var(--line);}
@@ -252,43 +246,43 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .balance-note b{color:var(--teal-dark);}
 
 /* Overview modal specifics */
-.tab-row{display:flex; gap:6px; margin-top:14px; border-bottom:1px solid var(--line);}
+.tab-row{display:flex; gap:4px; margin-top:14px; border-bottom:1px solid var(--line); overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch; padding-bottom:4px;}
 .ov-tab{
-  font-size:12.5px; font-weight:600; color:var(--ink-soft); padding:8px 4px; cursor:pointer;
-  border-bottom:2px solid transparent; margin-bottom:-1px;
+  font-size:13px; font-weight:600; color:var(--ink-soft); padding:10px 12px; cursor:pointer;
+  border-bottom:2px solid transparent; display:inline-block;
 }
 .ov-tab.active{color:var(--teal-dark); border-bottom-color:var(--gold);}
 .ov-panel{margin-top:14px;}
 .search-result{
   display:flex; justify-content:space-between; align-items:center; gap:10px;
-  padding:10px 0; border-bottom:1px solid var(--line); cursor:pointer;
+  padding:12px 6px; border-bottom:1px solid var(--line); cursor:pointer;
 }
 .search-result:hover{background:var(--bg);}
 .search-result .sr-left{font-size:13px;}
 .search-result .sr-left .n{font-weight:600; color:var(--teal-dark);}
 .search-result .sr-left .m{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft);}
-.search-result .sr-right{font-size:11px; text-align:right; color:var(--ink-soft);}
+.search-result .sr-right{font-size:11px; text-align:right; color:var(--ink-soft); flex-shrink:0;}
 .empty-note{font-size:13px; color:var(--ink-soft); padding:12px 0;}
 
-.footer-note{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:16px; opacity:0.8; }
+.footer-note{ text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:16px; opacity:0.8; padding-bottom:20px; }
 
 /* ---------- Login screen ---------- */
 .login-screen{
   min-height:100vh; display:flex; align-items:center; justify-content:center;
-  padding:20px; background:var(--bg);
+  padding:16px; background:var(--bg);
 }
 .login-card{
   width:100%; max-width:380px; background:var(--surface); border-radius:18px;
-  border:1px solid var(--line); box-shadow:var(--shadow); padding:32px 28px;
+  border:1px solid var(--line); box-shadow:var(--shadow); padding:32px 20px;
   text-align:center;
 }
 .login-card .mark{ width:38px; height:38px; color:var(--gold); margin:0 auto 10px; display:block; }
 .login-card h2{ font-family:'Marcellus', serif; font-size:21px; color:var(--teal-dark); margin:0 0 4px; font-weight:400; }
 .login-card p.sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 20px; }
 .login-card .field{ text-align:left; }
-.login-card .btn.primary{ width:100%; margin-top:16px; padding:11px; }
-.login-remember{ display:flex; align-items:center; gap:8px; margin-top:14px; font-size:13px; color:var(--ink-soft); text-align:left; }
-.login-remember input{ width:15px; height:15px; accent-color:var(--teal); }
+.login-card .btn.primary{ width:100%; margin-top:16px; padding:12px; }
+.login-remember{ display:flex; align-items:center; gap:8px; margin-top:14px; font-size:13px; color:var(--ink-soft); text-align:left; min-height:44px; }
+.login-remember input{ width:18px; height:18px; accent-color:var(--teal); }
 .login-err{ color:var(--rose); font-size:12.5px; margin-top:10px; display:none; }
 .login-hint{ font-size:11.5px; color:var(--ink-soft); margin-top:18px; opacity:0.8; }
 
@@ -297,20 +291,20 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
 /* ---------- Receipt paper ---------- */
 .receipt-paper{
-  border:1.5px solid var(--teal-dark); border-radius:4px; padding:20px 22px; margin-top:14px;
+  border:1.5px solid var(--teal-dark); border-radius:4px; padding:16px; margin-top:14px;
   background:#FEFCF6; position:relative;
 }
 .receipt-paper::before{
-  content:""; position:absolute; inset:6px; border:1px dashed var(--gold-line); border-radius:2px; pointer-events:none;
+  content:""; position:absolute; inset:5px; border:1px dashed var(--gold-line); border-radius:2px; pointer-events:none;
 }
-.rp-head{ text-align:center; padding-bottom:12px; margin-bottom:12px; border-bottom:2px solid var(--teal-dark); }
-.rp-head .rp-title{ font-family:'Marcellus', serif; font-size:19px; color:var(--teal-dark); margin:0; }
+.rp-head{ text-align:center; padding-bottom:10px; margin-bottom:10px; border-bottom:2px solid var(--teal-dark); }
+.rp-head .rp-title{ font-family:'Marcellus', serif; font-size:17px; color:var(--teal-dark); margin:0; }
 .rp-head .rp-sub{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:4px 0 0; }
-.rp-ref{ text-align:center; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--gold); letter-spacing:0.06em; margin-bottom:14px; }
+.rp-ref{ text-align:center; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--gold); letter-spacing:0.06em; margin-bottom:12px; }
 .rp-row{ display:flex; justify-content:space-between; gap:10px; padding:6px 0; border-bottom:1px dotted var(--line); font-size:13px; }
 .rp-row:last-child{border-bottom:none;}
-.rp-row .k{color:var(--ink-soft);}
-.rp-row .v{font-weight:600; text-align:right;}
+.rp-row .k{color:var(--ink-soft); flex-shrink:0;}
+.rp-row .v{font-weight:600; text-align:right; word-break:break-word;}
 .rp-row .v.mono{font-family:'IBM Plex Mono', monospace; font-weight:500;}
 .rp-divider{ border-top:1px dashed var(--gold-line); margin:10px 0; }
 .rp-footer{ text-align:center; margin-top:14px; font-size:11.5px; color:var(--ink-soft); font-style:italic; }
@@ -321,7 +315,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   color:#F7F3E8; border-radius:14px; padding:18px 20px; margin-top:4px;
 }
 .acct-hero .lbl{ font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold); opacity:0.9; }
-.acct-hero .num{ font-family:'Marcellus', serif; font-size:32px; margin:4px 0 0; }
+.acct-hero .num{ font-family:'Marcellus', serif; font-size:28px; margin:4px 0 0; }
 .acct-hero .sub{ font-size:12px; color:#D9E3DE; opacity:0.85; margin-top:6px; }
 
 .acct-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:14px; }
@@ -330,15 +324,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 .acct-card.sd-collected{border-left-color:var(--gold);}
 .acct-card.sd-released{border-left-color:var(--teal);}
 .acct-card.balance-due{border-left-color:var(--rose);}
-.acct-card .num{ font-family:'IBM Plex Mono', monospace; font-size:16.5px; font-weight:600; color:var(--teal-dark); }
+.acct-card .num{ font-family:'IBM Plex Mono', monospace; font-size:15px; font-weight:600; color:var(--teal-dark); word-break:break-all; }
 .acct-card .lbl{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.03em; margin-top:4px; }
 
 .item-row{display:flex; gap:8px; align-items:center; margin-top:8px;}
 .item-row:first-child{margin-top:0;}
-.item-row .item-name{flex:2; min-width:0; font-family:'Work Sans', sans-serif; font-size:14px; border:1px solid var(--line); border-radius:9px; padding:9px 11px; background:var(--surface); color:var(--ink);}
-.item-row .item-rate{flex:1; min-width:0; font-family:'Work Sans', sans-serif; font-size:14px; border:1px solid var(--line); border-radius:9px; padding:9px 11px; background:var(--surface); color:var(--ink);}
+.item-row .item-name{flex:2; min-width:0; font-family:'Work Sans', sans-serif; font-size:14px; border:1px solid var(--line); border-radius:9px; padding:12px 11px; background:var(--surface); color:var(--ink); min-height:44px;}
+.item-row .item-rate{flex:1; min-width:0; font-family:'Work Sans', sans-serif; font-size:14px; border:1px solid var(--line); border-radius:9px; padding:12px 11px; background:var(--surface); color:var(--ink); min-height:44px;}
 .item-row .item-name:focus, .item-row .item-rate:focus{outline:none; border-color:var(--gold);}
-.item-row .item-remove{flex:none; padding:8px 12px; font-size:14px; line-height:1;}
+.item-row .item-remove{flex:none; padding:8px 12px; font-size:14px; line-height:1; min-height:44px;}
 
 #printArea{display:none;}
 
@@ -350,23 +344,39 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   body.printing .receipt-paper::before{ border-color:#999; }
 }
 
-@media (max-width:520px){
-  .row2, .row3{grid-template-columns:1fr;}
-  .summary-strip{grid-template-columns:repeat(2,1fr);}
-  .day .name{display:none;}
-  .acct-grid{grid-template-columns:1fr;}
-  .modal{padding:20px 16px 16px;}
-  .header-inner{gap:12px;}
-  .header-actions{width:100%;}
-  .header-actions .icon-btn{width:100%; justify-content:center;}
+/* Desktop Modals Styling rule fallback */
+@media (min-width: 521px) {
+  .overlay {
+    align-items: center;
+    padding: 18px;
+  }
+  .modal {
+    border-radius: 16px;
+    max-height: 88vh;
+    padding: 24px;
+  }
 }
 
-@media (max-width:380px){
+@media (max-width:520px){
+  .row2, .row3{grid-template-columns:1fr; gap:0;}
+  .summary-strip{grid-template-columns:repeat(2,1fr);}
+  .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
+  .day .name{display:none;}
+  .acct-grid{grid-template-columns:1fr;}
+  .header-inner{gap:12px;}
+  .header-actions{width:100%;}
+  .header-actions .icon-btn{width:100%;}
+  .bc-actions {flex-direction: column;}
+  .bc-actions .btn {width: 100%;}
+}
+
+@media (max-width:380px) {
   .grid{gap:4px;}
-  .day{border-radius:9px; padding:4px 4px 3px;}
+  .day{border-radius:9px; padding:4px; min-height: 48px;}
   .day .num{font-size:11px;}
   .floor-tab{font-size:12.5px; padding:8px 12px;}
   .month-label{font-size:17px;}
+  .summary-cell .num{font-size: 13.5px;}
 }
 </style>
 </head>
@@ -482,9 +492,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     settings: {
       slotsEnabled:false,
       ground:{fullDay:'',halfDay:'',cleaning:'',deposit:''}, first:{fullDay:'',halfDay:'',cleaning:'',deposit:''}, second:{fullDay:'',halfDay:'',cleaning:'',deposit:''},
-      multiFloorDeposit: { two:'', all:'' },
-      rentalItems: [],
-      electricityRate: ''
+      packageTwoFloorsDeposit: '5000',
+      packageThreeFloorsDeposit: '5000',
+      elecRate: '',
+      inventoryItems: [
+        { name:'Chair', rate:'5' },
+        { name:'Table', rate:'20' },
+        { name:'Blanket', rate:'30' },
+        { name:'Gadda', rate:'50' }
+      ]
     },
     currentFloor: 'ground',
     viewYear: new Date().getFullYear(),
@@ -499,15 +515,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function num(v){ var n = parseFloat(v); return isNaN(n) ? 0 : n; }
   function money(v){ return '₹ ' + num(v).toLocaleString('en-IN'); }
   function escapeHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function attr(v){ return v ? escapeHtml(String(v)) : ''; }
+  function attr(v){ return (v || v===0) ? escapeHtml(String(v)) : ''; }
   function slotsOn(){ return !!(state.settings && state.settings.slotsEnabled); }
   function slotLabelOf(b){
     if(!b || !b.slot) return null;
     var s = SLOTS.find(function(x){ return x.id===b.slot; });
     return s ? s.label : b.slot;
   }
-  function payableTotal(b){ return num(b.totalAmount) + num(b.cleaningCharge) + num(b.itemsTotal) + num(b.elecCharge); }
+  function payableTotal(b){
+    var total = num(b.totalAmount) + num(b.cleaningCharge) + num(b.sdAmount);
+    if(b.elecCharges) total += num(b.elecCharges);
+    if(b.inventoryCharges) total += num(b.inventoryCharges);
+    return total;
+  }
   function balanceDueOf(b){ return Math.max(payableTotal(b) - num(b.amountPaid), 0); }
+  function advancePaidOf(b){ return Math.max(num(b.amountPaid) - payableTotal(b), 0); }
 
   // ---------- Storage (Firebase Firestore) ----------
   async function loadAll(){
@@ -550,7 +572,18 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   }
 
   function defaultSettings(){
-    var s = { slotsEnabled:false, multiFloorDeposit:{two:'',all:''}, rentalItems:[], electricityRate:'' };
+    var s = {
+      slotsEnabled:false,
+      packageTwoFloorsDeposit: '5000',
+      packageThreeFloorsDeposit: '5000',
+      elecRate: '',
+      inventoryItems: [
+        { name:'Chair', rate:'5' },
+        { name:'Table', rate:'20' },
+        { name:'Blanket', rate:'30' },
+        { name:'Gadda', rate:'50' }
+      ]
+    };
     FLOORS.forEach(function(f){ s[f.id] = {fullDay:'',halfDay:'',cleaning:'',deposit:''}; });
     return s;
   }
@@ -569,12 +602,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
           merged[f.id] = { fullDay: fs.fullDay||'', halfDay: fs.halfDay||'', cleaning: fs.cleaning||'', deposit: fs.deposit||'' };
         }
       });
-      merged.multiFloorDeposit = {
-        two: (loaded.multiFloorDeposit && loaded.multiFloorDeposit.two) || '',
-        all: (loaded.multiFloorDeposit && loaded.multiFloorDeposit.all) || ''
-      };
-      merged.rentalItems = Array.isArray(loaded.rentalItems) ? loaded.rentalItems : [];
-      merged.electricityRate = loaded.electricityRate || '';
+      merged.packageTwoFloorsDeposit = loaded.packageTwoFloorsDeposit !== undefined ? String(loaded.packageTwoFloorsDeposit) : '5000';
+      merged.packageThreeFloorsDeposit = loaded.packageThreeFloorsDeposit !== undefined ? String(loaded.packageThreeFloorsDeposit) : '5000';
+      merged.elecRate = loaded.elecRate !== undefined ? String(loaded.elecRate) : '';
+      if(Array.isArray(loaded.inventoryItems)) merged.inventoryItems = loaded.inventoryItems;
       state.settings = merged;
     }catch(e){
       console.error(e);
@@ -624,7 +655,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     tabs.forEach(function(f){
       var btn = document.createElement('button');
       btn.className = 'floor-tab' + (state.currentFloor===f.id ? ' active' : '');
-      btn.innerHTML = '<span class="dot"></span>' + f.label;
+      btn.innerHTML = (f.id==='all' ? '<span class="dot"></span>' : '') + f.label;
       btn.onclick = function(){ state.currentFloor = f.id; renderFloorTabs(); renderCalendar(); };
       row.appendChild(btn);
     });
@@ -678,14 +709,12 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function renderLegend(){
     var el = document.getElementById('legend');
     if(state.currentFloor==='all'){
-      el.innerHTML =
-        '<div class="legend-item"><span class="legend-dot green"></span>Floor available</div>'+
-        '<div class="legend-item"><span class="legend-dot red"></span>Floor booked</div>';
+      el.innerHTML = '';
     } else {
       var items = ['<div class="legend-item"><span class="swatch available"></span>Available</div>'];
       if(slotsOn()) items.push('<div class="legend-item"><span class="swatch partial"></span>One slot booked</div>');
-      items.push('<div class="legend-item"><span class="swatch full"></span>Booked</div>');
-      items.push('<div class="legend-item"><span class="swatch released"></span>Deposit released</div>');
+      items.push('<div class="legend-item"><span class="swatch full"></span>Upcoming booking</div>');
+      items.push('<div class="legend-item"><span class="swatch past"></span>Past booking</div>');
       el.innerHTML = items.join('');
     }
   }
@@ -725,24 +754,40 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       if(iso === todayStr) cell.className += ' is-today';
 
       if(state.currentFloor==='all'){
-        var dotsHtml = FLOORS.map(function(f){
-          var booked = dayBookings(f.id, iso).length>0;
-          return '<span class="floor-dot '+(booked?'red':'green')+'"></span>';
-        }).join('');
-        cell.innerHTML = '<span class="num">'+dayNum+'</span><div class="floor-dots">'+dotsHtml+'</div>';
+        var groundBooked = dayBookings('ground', iso).length>0;
+        var firstBooked = dayBookings('first', iso).length>0;
+        var secondBooked = dayBookings('second', iso).length>0;
+        var anyBooked = groundBooked || firstBooked || secondBooked;
+
+        if(anyBooked){
+          cell.className += (iso < todayStr) ? ' past-highlight' : ' is-booked';
+        }
+
+        var html = '<span class="num">'+dayNum+'</span>';
+        if(iso >= todayStr){
+          var gBooked = dayBookings('ground', iso).length>0;
+          var fBooked = dayBookings('first', iso).length>0;
+          var sBooked = dayBookings('second', iso).length>0;
+          html += '<div class="floor-dots">'+
+            '<span class="floor-dot '+(sBooked?'red':'green')+'"></span>'+
+            '<span class="floor-dot '+(fBooked?'red':'green')+'"></span>'+
+            '<span class="floor-dot '+(gBooked?'red':'green')+'"></span>'+
+          '</div>';
+        }
+        cell.innerHTML = html;
       } else {
         var list = dayBookings(state.currentFloor, iso);
         var html = '<span class="num">'+dayNum+'</span>';
         if(list.length){
-          var allReleased = list.every(function(b){ return b.sdReleased; });
-          if(slotsOn()){
+          if(iso < todayStr){
+            cell.className += ' past-highlight';
+          } else if(slotsOn()){
             var full = isFullyBooked(list);
-            cell.className += ' is-booked ' + (full ? '' : 'partial') + (allReleased ? ' released' : '');
+            cell.className += ' is-booked ' + (full ? '' : 'partial');
           } else {
-            cell.className += ' is-booked' + (allReleased ? ' released' : '');
+            cell.className += ' is-booked';
           }
           if(list.length>1) html += '<span class="count-badge">×'+list.length+'</span>';
-          html += '<span class="status-dot"></span>';
           html += '<span class="name">'+escapeHtml(list[0].name)+(list.length>1?' +'+(list.length-1):'')+'</span>';
         }
         cell.innerHTML = html;
@@ -767,9 +812,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function buildReceiptPaperHtml(iso, floorId, b){
     var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
+    var total = payableTotal(b);
     var balance = balanceDueOf(b);
-    var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' ×'+it.qty; }).join(', ') : '';
+    var advance = advancePaidOf(b);
     var generatedOn = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+
+    var paymentRows = rpRow('Floor charges', money(b.totalAmount), true) +
+      rpRow('Cleaning charge', money(b.cleaningCharge), true) +
+      rpRow('Security deposit', money(b.sdAmount), true);
+    if(b.elecCharges) paymentRows += rpRow('Electricity charges', money(b.elecCharges), true);
+    if(b.inventoryCharges) paymentRows += rpRow('Items on rent', money(b.inventoryCharges), true);
+    paymentRows += rpRow('Total amount', money(total), true) +
+      rpRow('Amount paid', money(b.amountPaid), true) +
+      rpRow('Balance due', money(balance), true);
+    if(advance>0) paymentRows += rpRow('Advance / excess held', money(advance), true);
+
     return '<div class="receipt-paper">'+
       '<div class="rp-head"><p class="rp-title">Jamat Khana Booking Confirmation</p>'+
         '<p class="rp-sub">'+combinedFloorLabel(b, floorId)+'</p></div>'+
@@ -782,14 +839,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       rpRow('Mobile', escapeHtml(b.mobile), true) +
       rpRow('Address', escapeHtml(b.address)||'—') +
       '<div class="rp-divider"></div>'+
-      rpRow('Floor charges', money(b.totalAmount), true) +
-      rpRow('Cleaning charge', money(b.cleaningCharge), true) +
-      (itemsDesc ? rpRow('Items on rent', escapeHtml(itemsDesc)) : '') +
-      (num(b.itemsTotal) ? rpRow('Items total', money(b.itemsTotal), true) : '') +
-      (num(b.elecCharge) ? rpRow('Electricity ('+num(b.elecUnits)+' units)', money(b.elecCharge), true) : '') +
-      rpRow('Amount paid', money(b.amountPaid), true) +
-      rpRow('Balance due', money(balance), true) +
-      rpRow('Security deposit', money(b.sdAmount), true) +
+      paymentRows +
       (b.paymentDetails ? rpRow('Payment details', escapeHtml(b.paymentDetails)) : '') +
       '<p class="rp-footer">Generated on '+generatedOn+' · Please retain for your records</p>'+
     '</div>';
@@ -799,24 +849,26 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   function buildWhatsappText(iso, floorId, b){
     var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
     var balance = balanceDueOf(b);
-    var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' ×'+it.qty; }).join(', ') : '';
-    return 'Jamat Khana Booking Confirmation\n'+
+    var advance = advancePaidOf(b);
+    var text = 'Jamat Khana Booking Confirmation\n'+
       'Ref: '+refCode(b)+'\n\n'+
       'Dear '+b.name+',\n'+
-      'Your booking is confirmed:\n\n'+
+      'Here are your booking details:\n\n'+
       'Floor: '+combinedFloorLabel(b, floorId)+'\n'+
       'Date: '+fmtDateLabel(iso)+'\n'+
       (slotLabelOf(b) ? 'Slot: '+slotLabelOf(b)+'\n' : '')+
       'Event: '+(eventLabel||'—')+'\n\n'+
       'Floor charges: '+money(b.totalAmount)+'\n'+
       'Cleaning charge: '+money(b.cleaningCharge)+'\n'+
-      (itemsDesc ? 'Items on rent: '+itemsDesc+'\n' : '')+
-      (num(b.itemsTotal) ? 'Items total: '+money(b.itemsTotal)+'\n' : '')+
-      (num(b.elecCharge) ? 'Electricity ('+num(b.elecUnits)+' units): '+money(b.elecCharge)+'\n' : '')+
+      'Security deposit: '+money(b.sdAmount)+'\n';
+    if(b.elecCharges) text += 'Electricity charges: '+money(b.elecCharges)+'\n';
+    if(b.inventoryCharges) text += 'Items on rent: '+money(b.inventoryCharges)+'\n';
+    text += 'Total amount: '+money(payableTotal(b))+'\n'+
       'Amount paid: '+money(b.amountPaid)+'\n'+
-      'Balance due: '+money(balance)+'\n'+
-      'Security deposit: '+money(b.sdAmount)+'\n\n'+
-      'Please keep this message for your reference. Thank you!';
+      'Balance due: '+money(balance)+'\n';
+    if(advance>0) text += 'Advance / excess held: '+money(advance)+'\n';
+    text += '\nPlease keep this message for your reference. Thank you!';
+    return text;
   }
 
   function printReceipt(iso, floorId, b){
@@ -944,39 +996,44 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function bookingCardHtml(b, floorId, idSuffix){
     idSuffix = idSuffix || '';
+    var total = payableTotal(b);
     var balance = balanceDueOf(b);
+    var advance = advancePaidOf(b);
     var eventLabel = b.eventType === 'Other' ? (b.eventTypeOther || 'Other') : b.eventType;
     var floors = bookingFloors(b, floorId);
     var floorsNote = floors.length>1 ? '<div class="bc-event" style="margin-top:2px;">Booked together on: '+floors.map(function(id){return floorLabel(id);}).join(' + ')+'</div>' : '';
     var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
-    var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' ×'+it.qty; }).join(', ') : '';
+
+    var chargeRows = bcRow('Floor charges', money(b.totalAmount), true)+
+      bcRow('Cleaning charge', money(b.cleaningCharge), true)+
+      bcRow('Security deposit', money(b.sdAmount), true);
+    if(b.elecCharges) chargeRows += bcRow('Electricity charges', money(b.elecCharges), true);
+    if(b.inventoryCharges) chargeRows += bcRow('Inventory items charges', money(b.inventoryCharges), true);
+    chargeRows += bcRow('Total configuration', money(total), true)+
+      bcRow('Amount paid till now', money(b.amountPaid), true)+
+      bcRow('Current balance tracking', money(balance), true);
+    if(advance>0) chargeRows += bcRow('Advance / excess held', money(advance), true);
+
     return '<div class="booking-card">'+
       '<div class="bc-head">'+
         '<div>'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
         '<div class="bc-event">'+escapeHtml(eventLabel||'—')+'</div>'+
         floorsNote+
         '</div>'+
-        '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Deposit released':'Deposit pending')+'</span>'+
+        '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Billing complete':'Final billing pending')+'</span>'+
       '</div>'+
       '<div class="bc-rows">'+
         bcRow('Mobile', '<a href="tel:'+attr(b.mobile)+'">'+escapeHtml(b.mobile)+'</a>', true)+
         bcRow('Address', escapeHtml(b.address)||'—')+
-        bcRow('Floor charges', money(b.totalAmount), true)+
-        bcRow('Cleaning charge', money(b.cleaningCharge), true)+
-        (itemsDesc ? bcRow('Items on rent', escapeHtml(itemsDesc)) : '')+
-        (num(b.itemsTotal) ? bcRow('Items total', money(b.itemsTotal), true) : '')+
-        (num(b.elecCharge) ? bcRow('Electricity ('+num(b.elecUnits)+' units)', money(b.elecCharge), true) : '')+
-        bcRow('Amount paid', money(b.amountPaid), true)+
-        bcRow('Balance due', money(balance), true)+
-        bcRow('Security deposit', money(b.sdAmount), true)+
+        chargeRows+
         (b.paymentDetails ? bcRow('Payment details', escapeHtml(b.paymentDetails)) : '')+
-        (b.sdReleased ? bcRow('Released on', escapeHtml(b.sdReleaseDate||'—')) : '')+
-        (b.sdReleaseNotes ? bcRow('Release notes', escapeHtml(b.sdReleaseNotes)) : '')+
+        (b.sdReleased ? bcRow('Billing processed on', escapeHtml(b.sdReleaseDate||'—')) : '')+
+        (b.sdReleaseNotes ? bcRow('Billing notes', escapeHtml(b.sdReleaseNotes)) : '')+
       '</div>'+
       '<div class="bc-actions">'+
         '<button class="btn ghost" id="rcpt-'+b.id+idSuffix+'">Receipt</button>'+
         '<button class="btn ghost" id="edit-'+b.id+idSuffix+'">Edit</button>'+
-        (b.sdReleased ? '' : '<button class="btn release" id="rel-'+b.id+idSuffix+'">Release deposit</button>')+
+        '<button class="btn '+(b.sdReleased?'ghost':'release')+'" id="rel-'+b.id+idSuffix+'">'+(b.sdReleased?'Edit final billing':'Final billing')+'</button>'+
         '<button class="btn danger" id="can-'+b.id+idSuffix+'">Cancel</button>'+
       '</div>'+
     '</div>';
@@ -985,24 +1042,118 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function renderReleaseView(iso, floorId, b){
     var today = todayIso();
+    var itemsList = (state.settings && state.settings.inventoryItems) || [];
+    var currentUsage = b.inventoryQuantities || {};
+
+    var itemsHtml = itemsList.length ? itemsList.map(function(item){
+      var qty = currentUsage[item.name] || '';
+      return '<div class="field" style="margin-top:8px;">'+
+        '<label style="text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;">'+escapeHtml(item.name)+' — ₹'+num(item.rate)+' each</label>'+
+        '<input type="number" class="fInvQty" data-name="'+attr(item.name)+'" data-rate="'+num(item.rate)+'" value="'+attr(qty)+'" placeholder="Quantity used" min="0">'+
+      '</div>';
+    }).join('') : '<p class="hint" style="margin:0;">No rental items configured yet — add some in Settings.</p>';
+
     modalBox.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+' · '+floorLabel(floorId)+'</p>'+
-        '<h2 class="modal-title">Release security deposit</h2></div>'+
+        '<h2 class="modal-title">Final billing</h2></div>'+
         '<button class="close-btn" id="mClose">&times;</button>'+
       '</div>'+
-      '<div class="field"><label>Release date</label><input type="date" id="fReleaseDate" value="'+today+'"></div>'+
-      '<div class="field"><label>Release notes (optional)</label><textarea id="fReleaseNotes" rows="3" placeholder="e.g. Returned in cash, hall inspected, no damage">'+(b.sdReleaseNotes||'')+'</textarea></div>'+
+      '<div class="booking-card" style="margin-top:0;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Base charges</p>'+
+        bcRow('Floor charges', money(b.totalAmount), true)+
+        bcRow('Cleaning charge', money(b.cleaningCharge), true)+
+        bcRow('Security deposit', money(b.sdAmount), true)+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Electricity meter reading</p>'+
+        '<p class="hint" style="margin:0 0 8px;">Rate configured: '+money((state.settings && state.settings.elecRate) || 0)+' per unit</p>'+
+        '<div class="row2">'+
+          '<div class="field" style="margin-top:0;"><label>Opening reading</label><input type="number" id="fElecOpen" value="'+attr(b.elecOpen)+'" placeholder="0"></div>'+
+          '<div class="field" style="margin-top:0;"><label>Closing reading</label><input type="number" id="fElecClose" value="'+attr(b.elecClose)+'" placeholder="0"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Items on rent used</p>'+
+        itemsHtml+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px; background:var(--gold-soft); border-color:var(--gold-line);">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Settlement</p>'+
+        bcRow('Electricity charge', '<span id="calcElec">₹ 0</span>', true)+
+        bcRow('Items total', '<span id="calcInv">₹ 0</span>', true)+
+        bcRow('Total bill (floor + cleaning + electricity + items)', '<span id="calcGrandBill">₹ 0</span>', true)+
+        bcRow('Already paid', money(b.amountPaid), true)+
+        '<div id="settleOutcome" style="margin-top:10px; padding:10px; border-radius:8px; font-weight:600; text-align:center; font-size:13.5px;"></div>'+
+      '</div>'+
+      '<div class="field"><label>Billing processed on</label><input type="date" id="fReleaseDate" value="'+(b.sdReleaseDate||today)+'"></div>'+
+      '<div class="field"><label>Billing notes (optional)</label><textarea id="fReleaseNotes" rows="2" placeholder="e.g. Deposit returned in cash, hall inspected, no damage">'+(b.sdReleaseNotes||'')+'</textarea></div>'+
       '<div class="bc-actions">'+
         '<button class="btn ghost" id="mBack">Back</button>'+
-        '<button class="btn primary" id="mConfirmRelease">Confirm release</button>'+
+        '<button class="btn primary" id="mConfirmRelease">'+(b.sdReleased?'Update final billing':'Finalize billing')+'</button>'+
       '</div>';
+
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mBack').onclick = function(){ renderDayView(iso, floorId); };
+
+    var elecOpenEl = document.getElementById('fElecOpen');
+    var elecCloseEl = document.getElementById('fElecClose');
+    var invInputs = document.querySelectorAll('.fInvQty');
+
+    function recalc(){
+      var op = num(elecOpenEl.value), cl = num(elecCloseEl.value);
+      var rate = num((state.settings && state.settings.elecRate) || 0);
+      var elecCharge = (cl > op) ? (cl - op) * rate : 0;
+      document.getElementById('calcElec').textContent = money(elecCharge);
+
+      var invTotal = 0;
+      invInputs.forEach(function(inp){ invTotal += num(inp.value) * num(inp.getAttribute('data-rate')); });
+      document.getElementById('calcInv').textContent = money(invTotal);
+
+      var grandBill = num(b.totalAmount) + num(b.cleaningCharge) + elecCharge + invTotal;
+      document.getElementById('calcGrandBill').textContent = money(grandBill);
+
+      var paid = num(b.amountPaid);
+      var diff = grandBill - paid;
+      var outBox = document.getElementById('settleOutcome');
+      if(diff === 0){
+        outBox.style.background = 'var(--green-soft)'; outBox.style.color = 'var(--green)';
+        outBox.innerHTML = 'Account settled — security deposit fully covers the bill. No refund or extra charge.';
+      } else if(diff < 0){
+        outBox.style.background = 'var(--green-soft)'; outBox.style.color = 'var(--green)';
+        outBox.innerHTML = 'Refund to customer: '+money(Math.abs(diff))+'<br><span style="font-weight:400;font-size:11.5px;">Deposit more than covers the bill — return this from the deposit.</span>';
+      } else {
+        outBox.style.background = 'var(--rose-soft)'; outBox.style.color = 'var(--rose)';
+        outBox.innerHTML = 'Additional charge to collect: '+money(diff)+'<br><span style="font-weight:400;font-size:11.5px;">Deposit does not fully cover the bill — collect this extra amount.</span>';
+      }
+    }
+    elecOpenEl.addEventListener('input', recalc);
+    elecCloseEl.addEventListener('input', recalc);
+    invInputs.forEach(function(inp){ inp.addEventListener('input', recalc); });
+    recalc();
+
     document.getElementById('mConfirmRelease').onclick = async function(){
+      var op = num(elecOpenEl.value), cl = num(elecCloseEl.value);
+      var rate = num((state.settings && state.settings.elecRate) || 0);
+      var elecCharge = (cl > op) ? (cl - op) * rate : 0;
+
+      var invTotal = 0;
+      var invQuantities = {};
+      invInputs.forEach(function(inp){
+        var name = inp.getAttribute('data-name');
+        var qty = num(inp.value);
+        invTotal += qty * num(inp.getAttribute('data-rate'));
+        if(qty>0) invQuantities[name] = qty;
+      });
+
       b.sdReleased = true;
       b.sdReleaseDate = document.getElementById('fReleaseDate').value || today;
       b.sdReleaseNotes = document.getElementById('fReleaseNotes').value.trim();
+      b.elecOpen = op;
+      b.elecClose = cl;
+      b.elecCharges = elecCharge;
+      b.inventoryCharges = invTotal;
+      b.inventoryQuantities = invQuantities;
+
       var floors = bookingFloors(b, floorId);
       floors.forEach(function(fid){
         var arr = (state.data[fid] && state.data[fid][iso]) || [];
@@ -1036,32 +1187,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       return '<option value="'+e+'" '+(b.eventType===e?'selected':'')+'>'+e+'</option>';
     }).join('');
 
-    var rentalItemsList = (state.settings && state.settings.rentalItems) || [];
-    var existingItemsQty = {};
-    (b.items||[]).forEach(function(it){ existingItemsQty[it.id] = it.qty; });
-    var itemsFormHtml = rentalItemsList.length ? (
-      '<div class="booking-card" style="margin-top:14px;">'+
-        '<p class="bc-name" style="margin:0 0 8px;">Items on rent</p>'+
-        rentalItemsList.map(function(it){
-          return '<div class="field" style="margin-top:8px;">'+
-            '<label style="text-transform:none;letter-spacing:0;font-weight:600;font-size:13px;">'+escapeHtml(it.name)+' — ₹'+num(it.rate)+' each</label>'+
-            '<input type="number" class="fItemQty" data-item-id="'+attr(it.id)+'" data-rate="'+num(it.rate)+'" value="'+attr(existingItemsQty[it.id])+'" placeholder="Quantity used" min="0">'+
-          '</div>';
-        }).join('')+
-        '<p class="hint" id="itemsTotalNote" style="margin-top:10px;"></p>'+
-      '</div>'
-    ) : '';
-
-    var elecFormHtml =
-      '<div class="booking-card" style="margin-top:14px;">'+
-        '<p class="bc-name" style="margin:0 0 8px;">Electricity meter reading</p>'+
-        '<div class="row2">'+
-          '<div class="field" style="margin-top:0;"><label>Opening reading</label><input type="number" id="fElecOpening" value="'+attr(b.elecOpening)+'" placeholder="0"></div>'+
-          '<div class="field" style="margin-top:0;"><label>Closing reading</label><input type="number" id="fElecClosing" value="'+attr(b.elecClosing)+'" placeholder="0"></div>'+
-        '</div>'+
-        '<p class="hint" id="elecChargeNote" style="margin-top:8px;"></p>'+
-      '</div>';
-
     modalBox.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+'</p>'+
@@ -1080,14 +1205,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         '<div class="field" style="margin-top:0;"><label>Floor charges (₹)</label><input type="number" id="fTotalAmount" value="'+attr(b.totalAmount)+'" placeholder="0"></div>'+
         '<div class="field" style="margin-top:0;"><label>Cleaning charge (₹)</label><input type="number" id="fCleaningCharge" value="'+attr(b.cleaningCharge)+'" placeholder="0"></div>'+
       '</div>'+
-      itemsFormHtml+
-      elecFormHtml+
       '<div class="row2" style="margin-top:14px;">'+
         '<div class="field" style="margin-top:0;"><label>Deposit (₹)</label><input type="number" id="fSdAmount" value="'+attr(b.sdAmount)+'" placeholder="0"></div>'+
-        '<div class="field" style="margin-top:0;"><label>Amount paid (₹)</label><input type="number" id="fAmountPaid" value="'+attr(b.amountPaid)+'" placeholder="0"></div>'+
+        '<div class="field" style="margin-top:0;"><label>Total (₹)</label><input type="text" id="fGrandTotalDisplay" value="0" readonly style="opacity:0.8;font-weight:bold;background:#e2dcc8;"></div>'+
       '</div>'+
       (isEdit ? '' : '<p class="hint" id="autoFillHint" style="margin-top:6px;">Floor charges, cleaning charge, and deposit are filled in from your saved default rates — feel free to adjust.</p>')+
-      '<p class="hint">Amount paid is expected to cover floor charges + cleaning charge + items + electricity + deposit. Extra goes into the deposit. Any shortfall is taken out of the deposit first, then the cleaning charge, then the floor charges — items and electricity charges are always billed in full.</p>'+
+      '<div class="field"><label>Amount paid (₹)</label><input type="number" id="fAmountPaid" value="'+attr(b.amountPaid)+'" placeholder="0"></div>'+
+      '<p class="hint">Electricity and items on rent are added later at Final Billing, once usage is known.</p>'+
       '<p class="balance-note" id="balanceNote"></p>'+
       '<div class="field"><label>Payment details</label><textarea id="fPaymentDetails" rows="2" placeholder="e.g. UPI, cheque no., cash — reference notes">'+(b.paymentDetails||'')+'</textarea></div>'+
       '<p class="err" id="fErr">Please select at least one available floor'+(onSlots?', a time slot,':'')+' and fill in the name and mobile number.</p>'+
@@ -1107,48 +1231,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       });
     }
 
-    function computeItemsTotal(){
-      var total = 0;
-      document.querySelectorAll('.fItemQty').forEach(function(inp){
-        var qty = num(inp.value);
-        var rate = num(inp.getAttribute('data-rate'));
-        total += qty*rate;
-      });
-      return total;
-    }
-
-    function computeElecCharge(){
-      var openingEl = document.getElementById('fElecOpening');
-      var closingEl = document.getElementById('fElecClosing');
-      var opening = num(openingEl ? openingEl.value : 0);
-      var closing = num(closingEl ? closingEl.value : 0);
-      var units = Math.max(closing - opening, 0);
-      var rate = num(state.settings && state.settings.electricityRate);
-      return { units: units, charge: units*rate };
-    }
-
-    function updateExtrasNotes(){
-      var itemsNoteEl = document.getElementById('itemsTotalNote');
-      if(itemsNoteEl){
-        var itemsTotalNow = computeItemsTotal();
-        itemsNoteEl.textContent = itemsTotalNow ? ('Items total: '+money(itemsTotalNow)) : '';
-      }
-      var elecNoteEl = document.getElementById('elecChargeNote');
-      if(elecNoteEl){
-        var openingEl = document.getElementById('fElecOpening');
-        var closingEl = document.getElementById('fElecClosing');
-        var hasReading = (openingEl.value.trim()!=='' || closingEl.value.trim()!=='');
-        var elec = computeElecCharge();
-        if(hasReading){
-          elecNoteEl.textContent = elec.units+' unit'+(elec.units===1?'':'s')+' used × '+money(state.settings.electricityRate||0)+' = '+money(elec.charge);
-        } else if(state.settings.electricityRate){
-          elecNoteEl.textContent = 'Rate: '+money(state.settings.electricityRate)+' per unit';
-        } else {
-          elecNoteEl.textContent = 'Set the electricity rate in Settings to calculate this automatically.';
-        }
-      }
-    }
-
     function computeDefaultAmounts(){
       var total = 0, cleaning = 0, deposit = 0;
       selectedFloors.forEach(function(fid){
@@ -1162,13 +1244,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         cleaning += num(s.cleaning);
         deposit += num(s.deposit);
       });
-      // If booking multiple floors together, use the discounted deposit rate
-      // set in Settings instead of adding up each floor's individual deposit.
-      var mfd = (state.settings && state.settings.multiFloorDeposit) || {};
-      if(selectedFloors.length === FLOORS.length && mfd.all !== '' && mfd.all != null){
-        deposit = num(mfd.all);
-      } else if(selectedFloors.length === 2 && mfd.two !== '' && mfd.two != null){
-        deposit = num(mfd.two);
+      // If booking multiple floors together, use the discounted package deposit
+      // from Settings instead of adding up each floor's individual deposit.
+      if(state.settings){
+        if(selectedFloors.length === 2 && state.settings.packageTwoFloorsDeposit !== ''){
+          deposit = num(state.settings.packageTwoFloorsDeposit);
+        } else if(selectedFloors.length === FLOORS.length && state.settings.packageThreeFloorsDeposit !== ''){
+          deposit = num(state.settings.packageThreeFloorsDeposit);
+        }
       }
       return { total: total, cleaning: cleaning, deposit: deposit };
     }
@@ -1182,7 +1265,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       if(autoFlags.total){ totalInput.value = defaults.total || ''; baseFloor = defaults.total; }
       if(autoFlags.cleaning){ cleaningInput.value = defaults.cleaning || ''; baseCleaning = defaults.cleaning; }
       if(autoFlags.deposit){ sdInput.value = defaults.deposit || ''; baseDeposit = defaults.deposit; }
-      renderInitialNote();
+      applyPaidAllocation();
     }
 
     function renderSlotChoiceUI(){
@@ -1227,71 +1310,38 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     var otherWrap = document.getElementById('fEventOtherWrap');
     eventSelect.onchange = function(){ otherWrap.style.display = eventSelect.value==='Other' ? '' : 'none'; };
 
-    function renderInitialNote(){
-      updateExtrasNotes();
-      var extras = computeItemsTotal() + computeElecCharge().charge;
-      var due = baseFloor + baseCleaning + baseDeposit + extras;
-      var paidRaw = document.getElementById('fAmountPaid').value;
-      if(paidRaw.trim()===''){
-        document.getElementById('balanceNote').innerHTML = 'Amount due (floor charges + cleaning charge + items + electricity + deposit): <b>'+money(due)+'</b>';
-      } else {
-        var bal = Math.max(due - num(paidRaw), 0);
-        document.getElementById('balanceNote').innerHTML = 'Amount due (floor charges + cleaning charge + items + electricity + deposit): <b>'+money(due)+'</b> · Balance due: <b>'+money(bal)+'</b>';
-      }
-    }
-
     function applyPaidAllocation(){
-      updateExtrasNotes();
+      var floor = num(document.getElementById('fTotalAmount').value);
+      var cleaning = num(document.getElementById('fCleaningCharge').value);
+      var deposit = num(document.getElementById('fSdAmount').value);
+      var grandTotal = floor + cleaning + deposit;
+      document.getElementById('fGrandTotalDisplay').value = grandTotal || 0;
+
       var paidInput = document.getElementById('fAmountPaid');
+      var balanceNote = document.getElementById('balanceNote');
       if(paidInput.value.trim()===''){
-        renderInitialNote();
+        balanceNote.innerHTML = 'Amount due (floor charges + cleaning charge + deposit): <b>'+money(grandTotal)+'</b>';
         return;
       }
       var paid = num(paidInput.value);
-      var extras = computeItemsTotal() + computeElecCharge().charge;
-      var floor = baseFloor, cleaning = baseCleaning, deposit = baseDeposit;
-      var expected = floor + cleaning + deposit + extras;
-      var diff = paid - expected;
-      var newFloor = floor, newCleaning = cleaning, newDeposit = deposit;
-      var noteParts = [];
-      var shortfallRemaining = 0;
-
-      if(diff > 0){
-        newDeposit = deposit + diff;
-        noteParts.push(money(diff)+' extra added to deposit');
-      } else if(diff < 0){
-        var short = -diff;
-        var fromDeposit = Math.min(short, deposit); newDeposit = deposit - fromDeposit; short -= fromDeposit;
-        var fromCleaning = Math.min(short, cleaning); newCleaning = cleaning - fromCleaning; short -= fromCleaning;
-        var fromFloor = Math.min(short, floor); newFloor = floor - fromFloor; short -= fromFloor;
-        if(fromDeposit>0) noteParts.push('deposit reduced by '+money(fromDeposit));
-        if(fromCleaning>0) noteParts.push('cleaning charge reduced by '+money(fromCleaning));
-        if(fromFloor>0) noteParts.push('floor charges reduced by '+money(fromFloor));
-        shortfallRemaining = short;
+      var diff = paid - grandTotal;
+      if(diff === 0){
+        balanceNote.innerHTML = 'Status: fully paid — exact match.';
+      } else if(diff > 0){
+        balanceNote.innerHTML = 'Status: <b>'+money(diff)+'</b> advance received.';
+      } else {
+        balanceNote.innerHTML = 'Status: <b>'+money(Math.abs(diff))+'</b> balance due.';
       }
-
-      document.getElementById('fTotalAmount').value = newFloor || '';
-      document.getElementById('fCleaningCharge').value = newCleaning || '';
-      document.getElementById('fSdAmount').value = newDeposit || '';
-
-      var noteText = noteParts.length ? noteParts.join(', ') : 'covers floor charges, cleaning charge, items, electricity, and deposit exactly';
-      document.getElementById('balanceNote').innerHTML = 'Balance due: <b>'+money(shortfallRemaining)+'</b> · '+noteText;
     }
 
-    document.getElementById('fTotalAmount').addEventListener('input', function(){ autoFlags.total=false; baseFloor=num(this.value); applyPaidAllocation(); });
-    document.getElementById('fCleaningCharge').addEventListener('input', function(){ autoFlags.cleaning=false; baseCleaning=num(this.value); applyPaidAllocation(); });
-    document.getElementById('fSdAmount').addEventListener('input', function(){ autoFlags.deposit=false; baseDeposit=num(this.value); applyPaidAllocation(); });
+    document.getElementById('fTotalAmount').addEventListener('input', function(){ autoFlags.total=false; applyPaidAllocation(); });
+    document.getElementById('fCleaningCharge').addEventListener('input', function(){ autoFlags.cleaning=false; applyPaidAllocation(); });
+    document.getElementById('fSdAmount').addEventListener('input', function(){ autoFlags.deposit=false; applyPaidAllocation(); });
     document.getElementById('fAmountPaid').addEventListener('input', applyPaidAllocation);
-    document.querySelectorAll('.fItemQty').forEach(function(inp){ inp.addEventListener('input', applyPaidAllocation); });
-    var fElecOpeningEl = document.getElementById('fElecOpening');
-    var fElecClosingEl = document.getElementById('fElecClosing');
-    if(fElecOpeningEl) fElecOpeningEl.addEventListener('input', applyPaidAllocation);
-    if(fElecClosingEl) fElecClosingEl.addEventListener('input', applyPaidAllocation);
 
     if(onSlots) renderSlotChoiceUI();
-    else if(!isEdit) updateAutoAmounts();
-    renderInitialNote();
-
+    else updateAutoAmounts();
+    applyPaidAllocation();
 
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mCancelForm').onclick = function(){ renderDayView(iso, ctxFloorId); };
@@ -1302,18 +1352,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         document.getElementById('fErr').style.display = 'block';
         return;
       }
-      var itemsRecord = [];
-      rentalItemsList.forEach(function(it){
-        var inp = document.querySelector('.fItemQty[data-item-id="'+it.id+'"]');
-        var qty = inp ? num(inp.value) : 0;
-        if(qty>0) itemsRecord.push({ id: it.id, name: it.name, rate: num(it.rate), qty: qty });
-      });
-      var itemsTotalFinal = itemsRecord.reduce(function(s,it){ return s + it.rate*it.qty; }, 0);
-
-      var elecOpeningVal = document.getElementById('fElecOpening').value.trim();
-      var elecClosingVal = document.getElementById('fElecClosing').value.trim();
-      var elecUnitsFinal = Math.max(num(elecClosingVal) - num(elecOpeningVal), 0);
-      var elecChargeFinal = elecUnitsFinal * num(state.settings.electricityRate);
 
       var record = {
         id: b.id || genId(),
@@ -1328,15 +1366,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         amountPaid: document.getElementById('fAmountPaid').value.trim(),
         sdAmount: document.getElementById('fSdAmount').value.trim(),
         paymentDetails: document.getElementById('fPaymentDetails').value.trim(),
-        items: itemsRecord,
-        itemsTotal: itemsTotalFinal,
-        elecOpening: elecOpeningVal,
-        elecClosing: elecClosingVal,
-        elecUnits: elecUnitsFinal,
-        elecCharge: elecChargeFinal,
         sdReleased: b.sdReleased || false,
         sdReleaseDate: b.sdReleaseDate || '',
-        sdReleaseNotes: b.sdReleaseNotes || ''
+        sdReleaseNotes: b.sdReleaseNotes || '',
+        elecOpen: b.elecOpen || 0,
+        elecClose: b.elecClose || 0,
+        elecCharges: b.elecCharges || 0,
+        inventoryCharges: b.inventoryCharges || 0,
+        inventoryQuantities: b.inventoryQuantities || {}
       };
       if(onSlots) record.slot = selectedSlot;
 
@@ -1394,19 +1431,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
   var ovState = { tab:'search' };
   overlayOv.addEventListener('click', function(e){ if(e.target===overlayOv) overlayOv.classList.remove('show'); });
   document.getElementById('overviewBtn').onclick = function(){ renderOverview(); overlayOv.classList.add('show'); };
-
-  function allBookingsFlat(){
-    var out = [];
-    FLOORS.forEach(function(f){
-      var floorData = state.data[f.id] || {};
-      Object.keys(floorData).forEach(function(iso){
-        floorData[iso].forEach(function(b){
-          out.push({ iso:iso, floorId:f.id, floorLabel:f.label, b:b });
-        });
-      });
-    });
-    return out;
-  }
 
   function uniqueBookingsFlat(){
     var seen = {};
@@ -1549,7 +1573,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       '<div class="bc-head">'+
         '<div>'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
         '<div class="bc-event">'+escapeHtml(eventLabel||'—')+' · '+escapeHtml(b.mobile)+floorsNote+'</div></div>'+
-        '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Released':'Pending')+'</span>'+
+        '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Billing complete':'Pending')+'</span>'+
       '</div>'+
       '<div class="bc-rows">'+ bcRow('Balance due', money(balance), true) +'</div>'+
       '<div class="bc-actions"><button class="btn ghost" id="manage-'+b.id+'">Manage this booking</button></div>'+
@@ -1653,9 +1677,12 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       balanceDue += balanceDueOf(b);
     });
     var sdHeld = sdCollected - sdReleased;
+    // Note: amountPaid already includes any deposit collected up front (Total (₹) on the
+    // booking form is floor charges + cleaning charge + deposit), so cash balance is simply
+    // the total received — adding sdHeld again would double-count the deposit portion.
     return {
       totalReceived:totalReceived, sdCollected:sdCollected, sdReleased:sdReleased,
-      sdHeld:sdHeld, cashBalance:totalReceived+sdHeld, balanceDue:balanceDue, count:all.length
+      sdHeld:sdHeld, cashBalance:totalReceived, balanceDue:balanceDue, count:all.length
     };
   }
 
@@ -1707,18 +1734,18 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
       '<div class="acct-hero">'+
         '<p class="lbl">Total cash balance with you</p>'+
         '<p class="num">'+money(acc.cashBalance)+'</p>'+
-        '<p class="sub">Hall charges received plus deposits still held, across '+acc.count+' booking'+(acc.count===1?'':'s')+'</p>'+
+        '<p class="sub">Everything received so far — hall charges, deposits, and any billed extras — across '+acc.count+' booking'+(acc.count===1?'':'s')+'</p>'+
       '</div>'+
       '<div class="acct-grid">'+
-        acctCard('received','Total received (hall charges)', money(acc.totalReceived))+
+        acctCard('received','Total received (all payments)', money(acc.totalReceived))+
         acctCard('sd-collected','Security deposit collected', money(acc.sdCollected))+
-        acctCard('sd-released','Security deposit released', money(acc.sdReleased))+
+        acctCard('sd-released','Security deposit settled (billed)', money(acc.sdReleased))+
         acctCard('balance-due','Still due from customers', money(acc.balanceDue))+
       '</div>'+
       (floorFilter==='all'
-        ? '<div class="booking-card" style="margin-top:14px;"><p class="hint" style="margin:0 0 4px;">Cash balance by floor</p>'+renderFloorBreakdown(fromIso,toIso)+'</div>'
+        ? '<div class="booking-card" style="margin-top:14px;"><p class="hint" style="margin:0 0 4px;">Cash received by floor</p>'+renderFloorBreakdown(fromIso,toIso)+'</div>'
         : '')+
-      '<p class="hint">This treats every amount paid and every deposit collected as cash or bank funds in hand until a deposit is marked released. "Still due from customers" is money owed to you, separate from cash already in hand. A booking that covers more than one floor is counted once in the total above, but appears under each floor it covers in the breakdown below.</p>';
+      '<p class="hint">"Total cash balance" is simply every payment recorded (amount paid already includes any deposit collected up front). "Security deposit collected/settled" is a breakdown of how much of that cash is deposit money — collected but not yet added again, so it won\u2019t inflate the total above. "Still due from customers" is money owed to you, separate from cash already in hand. A booking that covers more than one floor is counted once in the total above, but appears under each floor it covers in the breakdown below.</p>';
   }
 
   function acctCard(cls, lbl, val){
@@ -1734,8 +1761,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function renderSettingsPanel(panel){
     var on = slotsOn();
-    var mfd = (state.settings && state.settings.multiFloorDeposit) || {};
-    var workingItems = ((state.settings && state.settings.rentalItems) || []).map(function(it){ return { id: it.id, name: it.name, rate: it.rate }; });
+    var pkgTwo = (state.settings && state.settings.packageTwoFloorsDeposit) || '';
+    var pkgThree = (state.settings && state.settings.packageThreeFloorsDeposit) || '';
+    var elecRate = (state.settings && state.settings.elecRate) || '';
+    var workingItems = ((state.settings && state.settings.inventoryItems) || []).map(function(it){ return { name: it.name, rate: it.rate }; });
 
     panel.innerHTML =
       '<div class="booking-card" style="margin-top:0;">'+
@@ -1763,20 +1792,20 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
         '<p class="bc-name" style="margin:0 0 4px;">Multi-floor deposit</p>'+
         '<p class="hint" style="margin:0 0 10px;">When a booking covers two floors, or all three floors together, use these lower deposit amounts instead of adding up each floor\u2019s individual deposit. Leave a box blank to keep adding the floors\u2019 deposits together as before.</p>'+
         '<div class="row2">'+
-          '<div class="field" style="margin-top:0;"><label>Any 2 floors together (₹)</label><input type="number" id="set-mfd-two" value="'+attr(mfd.two)+'" placeholder="e.g. 5000"></div>'+
-          '<div class="field" style="margin-top:0;"><label>All 3 floors together (₹)</label><input type="number" id="set-mfd-all" value="'+attr(mfd.all)+'" placeholder="e.g. 5000"></div>'+
+          '<div class="field" style="margin-top:0;"><label>Any 2 floors together (₹)</label><input type="number" id="set-pkg-two" value="'+attr(pkgTwo)+'" placeholder="e.g. 5000"></div>'+
+          '<div class="field" style="margin-top:0;"><label>All 3 floors together (₹)</label><input type="number" id="set-pkg-three" value="'+attr(pkgThree)+'" placeholder="e.g. 5000"></div>'+
         '</div>'+
       '</div>'+
       '<div class="booking-card" style="margin-top:10px;">'+
         '<p class="bc-name" style="margin:0 0 8px;">Items on rent</p>'+
-        '<p class="hint" style="margin:0 0 10px;">Add items like chairs, tables, and blankets with a rate per piece. These show up on the booking form so you can add the quantity used, and the total is added to the final bill.</p>'+
+        '<p class="hint" style="margin:0 0 10px;">Add items like chairs, tables, and blankets with a rate per piece. At Final Billing you\u2019ll enter how many of each were used, and the total is added to the bill.</p>'+
         '<div id="rentalItemsList"></div>'+
         '<button type="button" class="btn ghost" id="addItemBtn" style="margin-top:10px;">+ Add item</button>'+
       '</div>'+
       '<div class="booking-card" style="margin-top:10px;">'+
         '<p class="bc-name" style="margin:0 0 8px;">Electricity</p>'+
-        '<div class="field" style="margin-top:0;"><label>Rate per unit (₹)</label><input type="number" id="set-elecRate" value="'+attr(state.settings.electricityRate)+'" placeholder="e.g. 8"></div>'+
-        '<p class="hint" style="margin:8px 0 0;">Used with the opening and closing meter readings entered on each booking to calculate the electricity charge automatically.</p>'+
+        '<div class="field" style="margin-top:0;"><label>Rate per unit (₹)</label><input type="number" id="set-elecRate" value="'+attr(elecRate)+'" placeholder="e.g. 10"></div>'+
+        '<p class="hint" style="margin:8px 0 0;">Used at Final Billing with the opening and closing meter readings to calculate the electricity charge automatically.</p>'+
       '</div>'+
       '<button class="btn primary block" id="saveSettingsBtn">Save settings</button>'+
       '<p class="hint">When time slots are on, Half day rate applies to Morning and Evening bookings, and Full day blocks the whole date. Cleaning charge is added on top of the booking charge as a separate line. When a booking covers more than one floor, each floor\u2019s rates are added together for the default total, unless overridden by the multi-floor deposit above.</p>';
@@ -1802,7 +1831,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
     renderRentalItemsList();
 
     document.getElementById('addItemBtn').onclick = function(){
-      workingItems.push({ id: genId(), name:'', rate:'' });
+      workingItems.push({ name:'', rate:'' });
       renderRentalItemsList();
     };
 
@@ -1824,14 +1853,12 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
           deposit: document.getElementById('set-'+f.id+'-deposit').value.trim()
         };
       });
-      newSettings.multiFloorDeposit = {
-        two: document.getElementById('set-mfd-two').value.trim(),
-        all: document.getElementById('set-mfd-all').value.trim()
-      };
-      newSettings.rentalItems = workingItems
+      newSettings.packageTwoFloorsDeposit = document.getElementById('set-pkg-two').value.trim();
+      newSettings.packageThreeFloorsDeposit = document.getElementById('set-pkg-three').value.trim();
+      newSettings.inventoryItems = workingItems
         .filter(function(it){ return (it.name||'').trim()!==''; })
-        .map(function(it){ return { id: it.id || genId(), name: (it.name||'').trim(), rate: (it.rate!=null?String(it.rate).trim():'') }; });
-      newSettings.electricityRate = document.getElementById('set-elecRate').value.trim();
+        .map(function(it){ return { name: (it.name||'').trim(), rate: (it.rate!=null?String(it.rate).trim():'') }; });
+      newSettings.elecRate = document.getElementById('set-elecRate').value.trim();
 
       var btn = document.getElementById('saveSettingsBtn');
       btn.textContent = 'Saving…';
@@ -1853,19 +1880,25 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(22px,4vw,30px); margin:0; fo
 
   function downloadCsv(){
     var rows = [[
-      'Floor','Date','Slot','Event','Name','Mobile','Address','Floor Charges','Cleaning Charge','Items Rented','Items Total',
-      'Electricity Units','Electricity Charge','Amount Paid','Balance Due',
-      'Security Deposit','Payment Details','Deposit Released','Release Date','Release Notes'
+      'Floor','Date','Slot','Event','Name','Mobile','Address','Floor Charges','Cleaning Charge','Security Deposit',
+      'Items Used','Items Total','Electricity Opening','Electricity Closing','Electricity Charge',
+      'Total Configuration','Amount Paid','Balance Due','Advance/Excess Held','Payment Details',
+      'Billing Complete','Billing Processed On','Billing Notes'
     ]];
     uniqueBookingsFlat().sort(function(a,b){ return a.iso.localeCompare(b.iso); }).forEach(function(item){
       var b = item.b;
       var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : (b.eventType||'');
+      var total = payableTotal(b);
       var balance = balanceDueOf(b);
-      var itemsDesc = (b.items && b.items.length) ? b.items.map(function(it){ return it.name+' x'+it.qty; }).join(', ') : '';
+      var advance = advancePaidOf(b);
+      var itemsDesc = (b.inventoryQuantities && Object.keys(b.inventoryQuantities).length)
+        ? Object.keys(b.inventoryQuantities).map(function(name){ return name+' x'+b.inventoryQuantities[name]; }).join(', ')
+        : '';
       rows.push([
         item.floorLabel, item.iso, slotLabelOf(b)||'', eventLabel, b.name, b.mobile, b.address||'',
-        num(b.totalAmount), num(b.cleaningCharge), itemsDesc, num(b.itemsTotal),
-        num(b.elecUnits), num(b.elecCharge), num(b.amountPaid), balance, num(b.sdAmount), b.paymentDetails||'',
+        num(b.totalAmount), num(b.cleaningCharge), num(b.sdAmount),
+        itemsDesc, num(b.inventoryCharges), num(b.elecOpen), num(b.elecClose), num(b.elecCharges),
+        total, num(b.amountPaid), balance, advance, b.paymentDetails||'',
         b.sdReleased?'Yes':'No', b.sdReleaseDate||'', b.sdReleaseNotes||''
       ]);
     });
