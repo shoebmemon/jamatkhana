@@ -69,14 +69,40 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 }
 .icon-btn:hover{background:rgba(247,243,232,0.2);}
 
-.floor-row{ display:flex; gap:8px; margin-top:22px; flex-wrap:wrap; position:relative; }
-.floor-tab{
-  font-family:'Work Sans', sans-serif; font-weight:600; font-size:13.5px;
-  padding:10px 16px; border-radius:999px; border:1px solid rgba(247,243,232,0.25);
-  background:rgba(247,243,232,0.08); color:#EDE7D4; cursor:pointer;
-  display:flex; align-items:center; gap:7px; min-height:40px;
-  transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+.floor-row { 
+  display: flex; 
+  gap: 8px; 
+  margin-top: 14px; 
+  flex-wrap: nowrap; /* Forces all tabs into a single line */
+  overflow-x: auto; /* Enables horizontal scrolling if screens are very narrow */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* Hides the scrollbar on Firefox */
 }
+.floor-row::-webkit-scrollbar { 
+  display: none; /* Hides the scrollbar on Chrome/Safari */
+}
+
+.floor-tab {
+  font-family: 'Work Sans', sans-serif; 
+  font-weight: 600; 
+  font-size: 13.5px;
+  padding: 10px 16px; 
+  border-radius: 999px; 
+  border: 1px solid var(--line); 
+  background: var(--surface); /* White background */
+  color: var(--ink-soft); /* Dark text for visibility on light bg */
+  cursor: pointer;
+  display: flex; 
+  align-items: center; 
+  gap: 7px; 
+  min-height: 40px;
+  white-space: nowrap; /* Prevents text from breaking into two lines */
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.floor-tab .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+.floor-tab:hover { background: var(--gold-soft); color: var(--teal-dark); border-color: var(--gold-line); }
+.floor-tab.active { background: var(--gold); color: var(--teal-dark); border-color: var(--gold); }
 .floor-tab .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:0.6;}
 .floor-tab:hover{background:rgba(247,243,232,0.16);}
 .floor-tab.active{ background:var(--gold); color:var(--teal-dark); border-color:var(--gold); }
@@ -439,15 +465,17 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       <div class="titles">
         <p class="eyebrow">Booking Register</p>
         <h1>Jamat Khana Booking</h1>
-        <p class="subtitle">Ground · First · Second Floor — availability, events &amp; deposit tracking</p>
+        <!-- The subtitle text has been removed from here -->
       </div>
       <div class="header-actions">
         <button class="icon-btn" id="overviewBtn">Overview &amp; Search</button>
         <button class="icon-btn" id="logoutBtn">Sign out</button>
       </div>
     </div>
-    <div class="floor-row" id="floorRow"></div>
   </div>
+
+  <!-- The floor tabs have been moved here, outside and below the header -->
+  <div class="floor-row" id="floorRow"></div>
 
   <div class="card">
     <div class="cal-head">
@@ -498,10 +526,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   var starSVG = "<svg xmlns='http://www.w3.org/2000/svg' width='84' height='84'><path d='M42 8 L50 34 L76 34 L55 49 L63 75 L42 60 L21 75 L29 49 L8 34 L34 34 Z' fill='none' stroke='%23F7F3E8' stroke-width='2'/></svg>";
   document.documentElement.style.setProperty('--star-pattern', "url(\"data:image/svg+xml," + encodeURIComponent(starSVG).replace(/'/g,"%27") + "\")");
 
-  var FLOORS = [
-    {id:'ground', key:'bookings-ground', label:'Ground Floor'},
-    {id:'first',  key:'bookings-first',  label:'First Floor'},
-    {id:'second', key:'bookings-second', label:'Second Floor'}
+ var FLOORS = [
+    {id:'ground', key:'bookings-ground', label:'Ground'},
+    {id:'first',  key:'bookings-first',  label:'First'},
+    {id:'second', key:'bookings-second', label:'Second'}
   ];
   var SLOTS = [
     {id:'morning', label:'Morning'},
