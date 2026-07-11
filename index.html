@@ -59,21 +59,28 @@ body{
 }
 h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; font-weight:400; letter-spacing:0.01em; }
 
-/* Modern Signout Icon */
+/* NEW Aesthetic Logout Icon */
 .signout-icon {
-  background: rgba(247,243,232,0.1);
-  border: 1px solid rgba(247,243,232,0.28);
-  color: #F1EDE0;
-  width: 42px; height: 42px;
-  border-radius: 50%;
+  background: rgba(247,243,232,0.06);
+  border: 1px solid rgba(247,243,232,0.15);
+  color: var(--gold);
+  width: 44px; height: 44px;
+  border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background 0.15s; flex-shrink: 0;
+  cursor: pointer; transition: all 0.25s ease; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
-.signout-icon:hover { background: rgba(247,243,232,0.25); }
+.signout-icon:hover { 
+  background: var(--rose); 
+  color: #fff; 
+  border-color: var(--rose);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(163, 69, 58, 0.25);
+}
 
-/* Quick Access Overview Tabs (Now Inside Header) */
+/* Quick Access Overview Tabs (Inside Header) */
 .quick-nav-row {
-  position: relative; /* ensures it sits above the star background */
+  position: relative;
   display: flex; gap: 8px; margin-top: 20px;
   flex-wrap: nowrap; overflow-x: auto;
   -webkit-overflow-scrolling: touch; padding-bottom: 4px;
@@ -90,7 +97,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   cursor: pointer; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
   transition: all 0.15s ease;
 }
-.quick-nav-tab:hover { background: rgba(247,243,232,0.2); color: #fff; border-color: rgba(247,243,232,0.5); }
+.quick-nav-tab:hover { background: rgba(247,243,232,0.2); color: #fff; border-color: rgba(247,243,232,0.5); transform:translateY(-1px); }
 
 /* Centered, Gradient Tabs */
 .floor-row { 
@@ -129,11 +136,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .floor-tab:hover { transform: translateY(-1px); }
 .floor-tab.active { background: var(--gold); color: var(--teal-dark); border: none; }
 
-/* ---------- Card / Calendar ---------- */
+/* ---------- Card / Calendar with Animation ---------- */
 .card{
   background:var(--surface); border-radius:18px; margin-top:14px;
   padding:clamp(12px,3vw,28px); box-shadow:var(--shadow); border:1px solid var(--line);
 }
+.anim-enter {
+  animation: fadeUpCard 0.35s cubic-bezier(0.1, 0.76, 0.55, 0.94) forwards;
+}
+@keyframes fadeUpCard {
+  from { opacity: 0.2; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px; flex-wrap:wrap; }
 .month-label{ font-family:'Marcellus', serif; font-size:20px; color:var(--teal-dark); }
 .nav-group{display:flex; align-items:center; gap:6px;}
@@ -212,6 +227,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   align-items:flex-end; justify-content:center; z-index:50;
 }
 .overlay.show{display:flex;}
+
+/* Default Modal (Day View) -> slides up */
 .modal{
   background:var(--surface); border-radius:20px 20px 0 0; max-width:480px; width:100%;
   max-height:92vh; overflow-y:auto; padding:24px 16px 40px; box-shadow:0 -10px 40px rgba(10,25,25,0.25);
@@ -219,12 +236,26 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-.modal.wide{max-width:600px;}
+/* Centered Modal (Quick Nav Tabs) -> pops in the center */
+#overlayOv {
+  align-items: center; /* Centers vertically */
+  padding: 16px;
+}
+#modalOv {
+  border-radius: 20px; /* Fully rounded */
+  animation: popIn 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+  max-width: 600px;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95) translateY(15px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
 .modal-date{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px; }
 .modal-title{font-family:'Marcellus', serif; font-size:19px; color:var(--teal-dark); margin:0;}
-.close-btn{ background:none; border:none; font-size:28px; color:var(--ink-soft); cursor:pointer; line-height:1; padding:4px 12px; min-height:44px; display:flex; align-items:center; }
-.close-btn:hover{color:var(--ink);}
+.close-btn{ background:none; border:none; font-size:28px; color:var(--ink-soft); cursor:pointer; line-height:1; padding:4px 12px; min-height:44px; display:flex; align-items:center; transition:color 0.15s ease; }
+.close-btn:hover{color:var(--rose);}
 
 .field{margin-top:14px;}
 .field label{ display:block; font-size:11.5px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
@@ -421,10 +452,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .eyebrow { font-size: 10px; margin-bottom: 2px; }
 
   /* Scale down sign out button on mobile */
-  .signout-icon { width: 36px; height: 36px; }
+  .signout-icon { width: 38px; height: 38px; border-radius: 10px; }
   
   /* Tighter spacing for quick nav */
-  .quick-nav-row { margin-top: 10px; gap: 6px; }
+  .quick-nav-row { margin-top: 14px; gap: 6px; }
   .quick-nav-tab { font-size: 11.5px; padding: 6px 12px; }
 
   /* Tighter floor tabs */
@@ -476,17 +507,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         <p class="eyebrow">Booking Register</p>
         <h1>Jamat Khana Booking</h1>
       </div>
-      <!-- Modern Sign Out Icon -->
       <button class="signout-icon" id="logoutBtn" title="Sign out">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 17l5-5-5-5"></path>
+          <path d="M21 12H9"></path>
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-          <polyline points="16 17 21 12 16 7"></polyline>
-          <line x1="21" y1="12" x2="9" y2="12"></line>
         </svg>
       </button>
     </div>
     
-    <!-- Quick Access Overview Tabs Inside Header -->
     <div class="quick-nav-row" id="quickNavRow">
       <div class="quick-nav-tab" data-tab="search">Search</div>
       <div class="quick-nav-tab" data-tab="day">Day view</div>
@@ -500,7 +529,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   
   <div class="floor-row" id="floorRow"></div>
 
-  <div class="card">
+  <div class="card anim-enter" id="mainCard">
     <div class="cal-head">
       <div class="month-label" id="monthLabel">—</div>
       <div class="nav-group">
@@ -723,6 +752,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     return list.length > 0;
   }
 
+  // Trigger main card fade animation
+  function animateCard() {
+    var card = document.getElementById('mainCard');
+    card.classList.remove('anim-enter');
+    void card.offsetWidth; // trigger reflow
+    card.classList.add('anim-enter');
+  }
+
   // ---------- Floor tabs ----------
   function renderFloorTabs(){
     var row = document.getElementById('floorRow');
@@ -731,8 +768,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     tabs.forEach(function(f){
       var btn = document.createElement('button');
       btn.className = 'floor-tab' + (state.currentFloor===f.id ? ' active' : '');
-      btn.innerHTML = f.label; // Dot has been successfully removed from "All Floors"
-      btn.onclick = function(){ state.currentFloor = f.id; renderFloorTabs(); renderCalendar(); };
+      btn.innerHTML = f.label; 
+      btn.onclick = function(){ 
+        state.currentFloor = f.id; 
+        renderFloorTabs(); 
+        renderCalendar(); 
+        animateCard(); 
+      };
       row.appendChild(btn);
     });
   }
@@ -1598,6 +1640,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var d = new Date(iso+'T00:00:00');
         state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
         renderFloorTabs(); renderCalendar();
+        animateCard();
         overlayOv.classList.remove('show');
         openDayModal(iso, floorId);
       };
@@ -1635,6 +1678,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
           var d = new Date(iso+'T00:00:00');
           state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
           renderFloorTabs(); renderCalendar();
+          animateCard();
           overlayOv.classList.remove('show');
           openDayModal(iso, f.id);
         };
@@ -1707,6 +1751,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var d = new Date(iso+'T00:00:00');
         state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
         renderFloorTabs(); renderCalendar();
+        animateCard();
         overlayOv.classList.remove('show');
         openDayModal(iso, floorId);
       };
@@ -1735,6 +1780,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var d = new Date(iso+'T00:00:00');
         state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
         renderFloorTabs(); renderCalendar();
+        animateCard();
         overlayOv.classList.remove('show');
         openDayModal(iso, floorId);
       };
@@ -1998,13 +2044,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
   // ---------- Nav ----------
   document.getElementById('prevBtn').onclick = function(){
-    state.viewMonth--; if(state.viewMonth<0){ state.viewMonth=11; state.viewYear--; } renderCalendar();
+    state.viewMonth--; if(state.viewMonth<0){ state.viewMonth=11; state.viewYear--; } 
+    renderCalendar();
+    animateCard();
   };
   document.getElementById('nextBtn').onclick = function(){
-    state.viewMonth++; if(state.viewMonth>11){ state.viewMonth=0; state.viewYear++; } renderCalendar();
+    state.viewMonth++; if(state.viewMonth>11){ state.viewMonth=0; state.viewYear++; } 
+    renderCalendar();
+    animateCard();
   };
   document.getElementById('todayBtn').onclick = function(){
-    var t = new Date(); state.viewYear = t.getFullYear(); state.viewMonth = t.getMonth(); renderCalendar();
+    var t = new Date(); state.viewYear = t.getFullYear(); state.viewMonth = t.getMonth(); 
+    renderCalendar();
+    animateCard();
   };
 
   // --- NEW: Swipe to change floors ---
@@ -2038,12 +2090,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         state.currentFloor = tabOrder[currentIndex + 1];
         renderFloorTabs();
         renderCalendar();
+        animateCard();
       }
     } else {
       if (currentIndex > 0) {
         state.currentFloor = tabOrder[currentIndex - 1];
         renderFloorTabs();
         renderCalendar();
+        animateCard();
       }
     }
   }
