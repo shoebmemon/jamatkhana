@@ -358,23 +358,48 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 }
 
 @media (max-width:520px){
+  /* Existing mobile layout fixes */
   .row2, .row3{grid-template-columns:1fr; gap:0;}
   .summary-strip{grid-template-columns:repeat(2,1fr);}
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
-  .header-inner{gap:12px;}
-  .header-actions{width:100%;}
-  .header-actions .icon-btn{width:100%;}
   .bc-actions {flex-direction: column;}
   .bc-actions .btn {width: 100%;}
+
+  /* --- NEW: Compact Mobile Header --- */
+  .header { 
+    padding: 14px 16px; 
+    border-radius: 14px; 
+  }
+  .header-inner { gap: 10px; }
+  .mark { width: 32px; height: 32px; } /* Smaller logo */
+  h1 { font-size: 19px; } /* Slightly smaller title */
+  .subtitle { font-size: 11.5px; margin-top: 2px; }
+  .eyebrow { font-size: 10px; margin-bottom: 2px; }
+
+  /* Display buttons side-by-side to save vertical space */
+  .header-actions { 
+    width: 100%; 
+    flex-direction: row; 
+    margin-top: 4px; 
+  }
+  .header-actions .icon-btn { 
+    flex: 1; 
+    min-height: 38px; 
+    padding: 8px 10px; 
+    font-size: 12px; 
+  }
+
+  /* Tighter floor tabs */
+  .floor-row { margin-top: 12px; gap: 6px; }
+  .floor-tab { min-height: 36px; padding: 6px 12px; font-size: 12px; }
 }
 
 @media (max-width:380px) {
   .grid{gap:4px;}
   .day{border-radius:9px; padding:4px; min-height: 48px;}
   .day .num{font-size:11px;}
-  .floor-tab{font-size:12.5px; padding:8px 12px;}
   .month-label{font-size:17px;}
   .summary-cell .num{font-size: 13.5px;}
 }
