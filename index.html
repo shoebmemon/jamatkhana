@@ -59,16 +59,37 @@ body{
 }
 h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; font-weight:400; letter-spacing:0.01em; }
 
-.header-actions{position:relative; display:flex; gap:8px; flex-wrap:wrap;}
-.icon-btn{
-  display:flex; align-items:center; justify-content:center; gap:7px;
-  font-family:'Work Sans', sans-serif; font-weight:600; font-size:13px;
-  padding:12px 14px; border-radius:10px; border:1px solid rgba(247,243,232,0.28);
-  background:rgba(247,243,232,0.1); color:#F1EDE0; cursor:pointer; min-height:44px;
+/* Modern Signout Icon */
+.signout-icon {
+  background: rgba(247,243,232,0.1);
+  border: 1px solid rgba(247,243,232,0.28);
+  color: #F1EDE0;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.15s; flex-shrink: 0;
 }
-.icon-btn:hover{background:rgba(247,243,232,0.2);}
+.signout-icon:hover { background: rgba(247,243,232,0.25); }
 
-/* Updated Centered, Gradient Tabs */
+/* Quick Access Overview Tabs */
+.quick-nav-row {
+  display: flex; gap: 8px; margin-top: 12px;
+  flex-wrap: nowrap; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; padding-bottom: 4px;
+  scrollbar-width: none; justify-content: flex-start;
+}
+.quick-nav-row::-webkit-scrollbar { display: none; }
+
+.quick-nav-tab {
+  font-family: 'Work Sans', sans-serif; font-size: 12.5px; font-weight: 600;
+  padding: 8px 14px; border-radius: 999px; background: var(--surface);
+  border: 1px solid var(--line); color: var(--ink-soft);
+  cursor: pointer; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  transition: all 0.15s ease;
+}
+.quick-nav-tab:hover { border-color: var(--gold); color: var(--teal-dark); }
+
+/* Centered, Gradient Tabs */
 .floor-row { 
   display: flex; 
   gap: 8px; 
@@ -102,7 +123,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   white-space: nowrap; 
   transition: transform 0.1s ease, background 0.15s ease;
 }
-.floor-tab .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.8; }
 .floor-tab:hover { transform: translateY(-1px); }
 .floor-tab.active { background: var(--gold); color: var(--teal-dark); border: none; }
 
@@ -402,19 +422,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .mark { width: 32px; height: 32px; }
   h1 { font-size: 19px; }
   .eyebrow { font-size: 10px; margin-bottom: 2px; }
+
+  /* Scale down sign out button on mobile */
+  .signout-icon { width: 36px; height: 36px; }
   
-  /* Display buttons side-by-side */
-  .header-actions { 
-    width: 100%; 
-    flex-direction: row; 
-    margin-top: 4px; 
-  }
-  .header-actions .icon-btn { 
-    flex: 1; 
-    min-height: 38px; 
-    padding: 8px 10px; 
-    font-size: 12px; 
-  }
+  /* Tighter spacing for quick nav */
+  .quick-nav-row { margin-top: 10px; gap: 6px; }
+  .quick-nav-tab { font-size: 11.5px; padding: 6px 12px; }
 
   /* Tighter floor tabs */
   .floor-row { margin-top: 12px; gap: 6px; }
@@ -465,12 +479,26 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         <p class="eyebrow">Booking Register</p>
         <h1>Jamat Khana Booking</h1>
       </div>
-      <div class="header-actions">
-        <button class="icon-btn" id="overviewBtn">Overview &amp; Search</button>
-        <button class="icon-btn" id="logoutBtn">Sign out</button>
-      </div>
+      <button class="signout-icon" id="logoutBtn" title="Sign out">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
     </div>
   </div>
+  
+  <div class="quick-nav-row" id="quickNavRow">
+    <div class="quick-nav-tab" data-tab="search">Search</div>
+    <div class="quick-nav-tab" data-tab="day">Day view</div>
+    <div class="quick-nav-tab" data-tab="all">All bookings</div>
+    <div class="quick-nav-tab" data-tab="upcoming">Upcoming</div>
+    <div class="quick-nav-tab" data-tab="accounts">Accounts</div>
+    <div class="quick-nav-tab" data-tab="settings">Settings</div>
+    <div class="quick-nav-tab" data-tab="export">Export</div>
+  </div>
+
   <div class="floor-row" id="floorRow"></div>
 
   <div class="card">
@@ -704,7 +732,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     tabs.forEach(function(f){
       var btn = document.createElement('button');
       btn.className = 'floor-tab' + (state.currentFloor===f.id ? ' active' : '');
-      btn.innerHTML = (f.id==='all' ? '<span class="dot"></span>' : '') + f.label;
+      btn.innerHTML = f.label;
       btn.onclick = function(){ state.currentFloor = f.id; renderFloorTabs(); renderCalendar(); };
       row.appendChild(btn);
     });
@@ -1479,7 +1507,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   var modalOv = document.getElementById('modalOv');
   var ovState = { tab:'search' };
   overlayOv.addEventListener('click', function(e){ if(e.target===overlayOv) overlayOv.classList.remove('show'); });
-  document.getElementById('overviewBtn').onclick = function(){ renderOverview(); overlayOv.classList.add('show'); };
+  
+  // Open specific overview tab directly from the quick access row
+  document.querySelectorAll('.quick-nav-tab').forEach(function(btn){
+    btn.onclick = function(){ 
+      ovState.tab = btn.getAttribute('data-tab'); 
+      renderOverview(); 
+      overlayOv.classList.add('show'); 
+    };
+  });
 
   function uniqueBookingsFlat(){
     var seen = {};
