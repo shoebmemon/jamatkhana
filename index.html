@@ -461,9 +461,20 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .quick-nav-row { margin-top: 14px; gap: 6px; }
   .quick-nav-tab { font-size: 11.5px; padding: 6px 12px; }
 
-  /* Tighter floor tabs */
-  .floor-row { margin-top: 12px; gap: 6px; }
-  .floor-tab { min-height: 36px; padding: 6px 12px; font-size: 12px; }
+  /* Tighter floor tabs - Stretching edge to edge ONLY on mobile */
+  .floor-row { 
+    margin-top: 12px; 
+    gap: 6px; 
+    width: 100%; 
+  }
+  
+  .floor-tab { 
+    flex: 1; /* Stretches buttons equally */
+    justify-content: center; /* Keeps text centered */
+    min-height: 36px; 
+    padding: 6px 2px; /* Reduced side padding */
+    font-size: 11.5px; 
+  }
 
   /* UPDATED: Horizontal Scrolling Summary Strip for Mobile */
   .summary-strip {
