@@ -171,6 +171,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 }
 .summary-cell{
   background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+  cursor:pointer; transition:all 0.15s ease;
+}
+.summary-cell:hover{
+  border-color:var(--gold); transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.05);
 }
 .summary-cell .num{ font-family:'IBM Plex Mono', monospace; font-size:15px; font-weight:600; color:var(--teal-dark); word-break:break-word; }
 .summary-cell .lbl{ font-size:10px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
@@ -791,6 +795,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   function combinedFloorLabel(b, fallbackFloorId){ return bookingFloors(b, fallbackFloorId).map(function(id){ return floorLabel(id); }).join(' + '); }
 
   // ---------- Month summary ----------
+  function summaryCell(num, lbl, id){ 
+    return '<div class="summary-cell" id="'+id+'"><div class="num">'+num+'</div><div class="lbl">'+lbl+'</div></div>'; 
+  }
+
   function renderSummaryStrip(){
     var y=state.viewYear, m=state.viewMonth;
     var count=0, collected=0, balanceDue=0, depositPending=0;
@@ -816,13 +824,132 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     }
 
     var el = document.getElementById('summaryStrip');
+    // Inject the HTML with specific IDs for each cell
     el.innerHTML =
-      summaryCell(count, 'Bookings this month') +
-      summaryCell(money(collected), 'Collected') +
-      summaryCell(money(balanceDue), 'Balance due') +
-      summaryCell(money(depositPending), 'Deposits pending');
+      summaryCell(count, 'Bookings this month', 'sum-bookings') +
+      summaryCell(money(collected), 'Collected', 'sum-collected') +
+      summaryCell(money(balanceDue), 'Balance due', 'sum-balance') +
+      summaryCell(money(depositPending), 'Deposits pending', 'sum-deposit');
+
+    // Attach click event listeners to open the respective popups
+    document.getElementById('sum-bookings').onclick = function(){ openSummaryModal('bookings'); };
+    document.getElementById('sum-collected').onclick = function(){ openSummaryModal('collected'); };
+    document.getElementById('sum-balance').onclick = function(){ openSummaryModal('balance'); };
+    document.getElementById('sum-deposit').onclick = function(){ openSummaryModal('deposit'); };
   }
-  function summaryCell(num, lbl){ return '<div class="summary-cell"><div class="num">'+num+'</div><div class="lbl">'+lbl+'</div></div>'; }
+
+  // Helper to fetch all bookings specifically for the currently viewed month and floor
+  function getMonthBookings() {
+    var y = state.viewYear, m = state.viewMonth;
+    var out = [];
+    if(state.currentFloor === 'all'){
+      uniqueBookingsFlat().forEach(function(item){
+        var d = new Date(item.iso+'T00:00:00');
+        if(d.getFullYear()===y && d.getMonth()===m) out.push(item);
+      });
+    } else {
+      var bookings = state.data[state.currentFloor] || {};
+      Object.keys(bookings).forEach(function(iso){
+        var d = new Date(iso+'T00:00:00');
+        if(d.getFullYear()===y && d.getMonth()===m) {
+          bookings[iso].forEach(function(b){
+            var floors = bookingFloors(b, state.currentFloor);
+            out.push({ iso:iso, floorIds:floors, floorLabel: floors.map(function(id){return floorLabel(id);}).join(' + '), b:b });
+          });
+        }
+      });
+    }
+    
+    // Sort chronologically and deduplicate
+    out.sort(function(a,b){ return a.iso.localeCompare(b.iso); });
+    var uniqueOut = [], seen = {};
+    out.forEach(function(item){
+      if(!seen[item.b.id]){ seen[item.b.id] = true; uniqueOut.push(item); }
+    });
+    return uniqueOut;
+  }
+
+  // Opens the pop-up panel based on the clicked summary strip cell
+  function openSummaryModal(type) {
+    var y = state.viewYear, m = state.viewMonth;
+    var monthName = MONTHS[m] + ' ' + y;
+    var bookings = getMonthBookings();
+    
+    var title = '';
+    var filtered = [];
+    var renderItem = function(item){ return ''; };
+
+    if(type === 'bookings') {
+      title = 'Bookings in ' + monthName;
+      filtered = bookings;
+      renderItem = function(item){
+        return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
+          '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+fmtDateLabel(item.iso).split(',')[0]+', '+item.iso.slice(0,4)+'</div></div>'+
+          '<div class="sr-right">'+item.floorLabel+'<br>'+(slotLabelOf(item.b)?' · '+slotLabelOf(item.b):'')+'</div>'+
+        '</div>';
+      };
+    } else if(type === 'collected') {
+      title = 'Amounts Collected (' + monthName + ')';
+      filtered = bookings.filter(function(item){ return num(item.b.amountPaid) > 0; });
+      renderItem = function(item){
+        return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
+          '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+escapeHtml(item.b.mobile)+'</div></div>'+
+          '<div class="sr-right" style="font-size:13px; font-weight:600; color:var(--teal-dark);">'+money(item.b.amountPaid)+' collected</div>'+
+        '</div>';
+      };
+    } else if(type === 'balance') {
+      title = 'Balance Due (' + monthName + ')';
+      filtered = bookings.filter(function(item){ return balanceDueOf(item.b) > 0; });
+      renderItem = function(item){
+        return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
+          '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+escapeHtml(item.b.mobile)+'</div></div>'+
+          '<div class="sr-right" style="font-size:13px; font-weight:600; color:var(--rose);">'+money(balanceDueOf(item.b))+' due</div>'+
+        '</div>';
+      };
+    } else if(type === 'deposit') {
+      title = 'Deposits Pending (' + monthName + ')';
+      filtered = bookings.filter(function(item){ return !item.b.sdReleased && num(item.b.sdAmount) > 0; });
+      renderItem = function(item){
+        return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
+          '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+escapeHtml(item.b.mobile)+'</div></div>'+
+          '<div class="sr-right" style="font-size:13px; font-weight:600; color:var(--gold);">'+money(item.b.sdAmount)+' pending</div>'+
+        '</div>';
+      };
+    }
+
+    var panelHtml = filtered.length === 0 
+      ? '<p class="empty-note">No records found for this category in ' + monthName + '.</p>'
+      : filtered.map(renderItem).join('');
+
+    var modalOv = document.getElementById('modalOv');
+    var overlayOv = document.getElementById('overlayOv');
+    
+    modalOv.innerHTML =
+      '<div class="modal-head">'+
+        '<div><p class="modal-date">Summary Breakdown</p><h2 class="modal-title">' + title + '</h2></div>'+
+        '<button class="close-btn" id="ovClose">&times;</button>'+
+      '</div>'+
+      '<div class="ov-panel" style="margin-top:4px;">' + panelHtml + '</div>';
+      
+    document.getElementById('ovClose').onclick = function(){ overlayOv.classList.remove('show'); };
+    
+    // Clicking a row takes the admin straight to that day's booking details
+    modalOv.querySelectorAll('.search-result').forEach(function(row){
+      row.onclick = function(){
+        var iso = row.getAttribute('data-iso');
+        var floorId = row.getAttribute('data-floor');
+        state.currentFloor = floorId;
+        var d = new Date(iso+'T00:00:00');
+        state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
+        renderFloorTabs(); renderCalendar();
+        animateCard();
+        overlayOv.classList.remove('show');
+        openDayModal(iso, floorId);
+      };
+    });
+
+    overlayOv.classList.add('show');
+  }
 
   function renderLegend(){
     var el = document.getElementById('legend');
