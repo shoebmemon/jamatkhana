@@ -444,27 +444,28 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .bc-actions {flex-direction: column;}
   .bc-actions .btn {width: 100%;}
   
-  /* Ultra-Compact 4-column single line */
+  /* Ultra-Compact 4-column single line - Updated for larger font */
   .summary-strip {
     grid-template-columns: repeat(4, 1fr);
-    gap: 4px; 
+    gap: 3px; 
     margin-bottom: 12px;
   }
   .summary-cell {
-    padding: 6px 2px; 
+    padding: 6px 1px; 
     border-radius: 8px;
     text-align: center; 
   }
   .summary-cell .num {
-    font-size: 12px; 
+    font-size: 13.5px; /* Increased from 12px */
+    font-weight: 700;  /* Added slight boldness for better readability */
   }
   .summary-cell .lbl {
-    font-size: 8px; 
+    font-size: 8.5px;  /* Increased from 8px */
     letter-spacing: 0;
     margin-top: 1px;
     white-space: nowrap; 
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: clip; /* Prevents dots, keeps text as clear as possible */
   }
   
   /* Compact Mobile Header */
