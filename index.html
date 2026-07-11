@@ -438,7 +438,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 @media (max-width:520px){
   /* Existing mobile layout fixes */
   .row2, .row3{grid-template-columns:1fr; gap:0;}
-  .summary-strip{grid-template-columns:repeat(2,1fr);}
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
@@ -465,6 +464,27 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   /* Tighter floor tabs */
   .floor-row { margin-top: 12px; gap: 6px; }
   .floor-tab { min-height: 36px; padding: 6px 12px; font-size: 12px; }
+
+  /* UPDATED: Horizontal Scrolling Summary Strip for Mobile */
+  .summary-strip {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    width: 100%;
+  }
+  
+  .summary-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .summary-cell {
+    flex: 0 0 auto;
+    width: 130px;
+  }
 }
 
 @media (max-width:380px) {
@@ -2193,10 +2213,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
   if (swipeCard) {
     swipeCard.addEventListener('touchstart', function(e) {
+      // IGNORE swipe if the user is touching the horizontally scrolling summary strip
+      if (e.target.closest('.summary-strip')) return;
       touchStartX = e.changedTouches[0].screenX;
     }, {passive: true});
 
     swipeCard.addEventListener('touchend', function(e) {
+      // IGNORE swipe if the user is touching the horizontally scrolling summary strip
+      if (e.target.closest('.summary-strip')) return;
       touchEndX = e.changedTouches[0].screenX;
       handleSwipe();
     }, {passive: true});
