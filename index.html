@@ -846,10 +846,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var el = document.getElementById('summaryStrip');
     // Inject the HTML with specific IDs for each cell
     el.innerHTML =
-      summaryCell(count, 'Bookings this month', 'sum-bookings') +
+      summaryCell(count, 'Bookings', 'sum-bookings') +
       summaryCell(money(collected), 'Collected', 'sum-collected') +
       summaryCell(money(balanceDue), 'Balance due', 'sum-balance') +
-      summaryCell(money(depositPending), 'Deposits pending', 'sum-deposit');
+      summaryCell(money(depositPending), 'Deposits', 'sum-deposit');
 
     // Attach click event listeners to open the respective popups
     document.getElementById('sum-bookings').onclick = function(){ openSummaryModal('bookings'); };
