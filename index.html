@@ -462,18 +462,25 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .quick-nav-tab { font-size: 11.5px; padding: 6px 12px; }
 
   /* Tighter floor tabs - Stretching edge to edge ONLY on mobile */
+  /* Tighter floor tabs - Stretching edge to edge ONLY on mobile */
   .floor-row { 
-    margin-top: 4px; /* <--- Changed from 12px to 4px to heavily reduce the gap */
+    margin-top: 4px; /* Tightens space ABOVE the buttons */
+    padding-bottom: 0px; /* Removes the old invisible scrollbar padding */
     gap: 6px; 
     width: 100%; 
-  }  
+  }
   
   .floor-tab { 
-    flex: 1; /* Stretches buttons equally */
-    justify-content: center; /* Keeps text centered */
+    flex: 1; 
+    justify-content: center; 
     min-height: 36px; 
-    padding: 6px 2px; /* Reduced side padding */
+    padding: 6px 2px; 
     font-size: 11.5px; 
+  }
+
+  /* Pull the white calendar card closer to the buttons */
+  .card {
+    margin-top: 6px; /* Default was 14px, this tightens the space BELOW the buttons */
   }
 
   /* UPDATED: Horizontal Scrolling Summary Strip for Mobile */
