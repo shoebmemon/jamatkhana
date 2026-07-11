@@ -438,29 +438,34 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 @media (max-width:520px){
   /* Existing mobile layout fixes */
   .row2, .row3{grid-template-columns:1fr; gap:0;}
- /* Ultra-Compact 2x2 Grid */
-  .summary-strip {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px; /* Reduced from 8px */
-    margin-bottom: 10px; /* Reduced bottom margin */
-  }
-  .summary-cell {
-    padding: 6px 8px; /* Tighter inner spacing */
-    border-radius: 8px; /* Slightly sharper corners to match tighter spacing */
-  }
-  .summary-cell .num {
-    font-size: 14px; /* Slightly smaller number */
-  }
-  .summary-cell .lbl {
-    font-size: 8.5px; /* Smaller label */
-    margin-top: 1px;
-    line-height: 1.1;
-  }
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
   .bc-actions {flex-direction: column;}
   .bc-actions .btn {width: 100%;}
+  
+  /* Ultra-Compact 4-column single line */
+  .summary-strip {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px; 
+    margin-bottom: 12px;
+  }
+  .summary-cell {
+    padding: 6px 2px; 
+    border-radius: 8px;
+    text-align: center; 
+  }
+  .summary-cell .num {
+    font-size: 12px; 
+  }
+  .summary-cell .lbl {
+    font-size: 8px; 
+    letter-spacing: 0;
+    margin-top: 1px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+  }
   
   /* Compact Mobile Header */
   .header { 
@@ -489,7 +494,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .day{border-radius:9px; padding:4px; min-height: 48px;}
   .day .num{font-size:11px;}
   .month-label{font-size:17px;}
-  .summary-cell .num{font-size: 13.5px;}
+  .summary-cell .num{font-size: 11px;}
 }
 </style>
 </head>
@@ -843,10 +848,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var el = document.getElementById('summaryStrip');
     // Inject the HTML with specific IDs for each cell
     el.innerHTML =
-      summaryCell(count, 'Bookings this month', 'sum-bookings') +
+      summaryCell(count, 'Bookings', 'sum-bookings') +
       summaryCell(money(collected), 'Collected', 'sum-collected') +
       summaryCell(money(balanceDue), 'Balance due', 'sum-balance') +
-      summaryCell(money(depositPending), 'Deposits pending', 'sum-deposit');
+      summaryCell(money(depositPending), 'Deposits', 'sum-deposit');
 
     // Attach click event listeners to open the respective popups
     document.getElementById('sum-bookings').onclick = function(){ openSummaryModal('bookings'); };
@@ -1223,7 +1228,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       var list = dayBookings(f.id, iso);
       var full = slotsOn() ? isFullyBooked(list) : (list.length>0);
       var cardsHtml = list.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('');
-      var openMsg = (!full && list.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p>' : '';
+      var openMsg = (!full && list.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no bookings on this floor.</p>' : '';
       var addBtn = full ? '' : '<button class="btn add block" id="addAll-'+f.id+'">+ Add booking on '+f.label+'</button>';
       return '<div style="margin-top:16px;">'+
         '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">'+f.label+'</p>'+
