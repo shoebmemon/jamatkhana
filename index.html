@@ -439,7 +439,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 /* Updated Mobile Media Query */
 @media (max-width:520px){
   /* Existing mobile layout fixes */
-  .row2, .row3{grid-template-columns:1fr; gap:0;}
+  .row2, .row3{grid-template-columns:1fr; gap:14px;}
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
@@ -812,7 +812,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       var btn = document.createElement('button');
       btn.className = 'floor-tab' + (state.currentFloor===f.id ? ' active' : '');
       var shortLabel = f.id==='all' ? f.label : f.label.replace(' Floor','');
-      btn.innerHTML = (f.id==='all' ? '<span class="dot"></span>' : '') + shortLabel;
+      btn.innerHTML = shortLabel;
       btn.onclick = function(){
         state.currentFloor = f.id;
         renderFloorTabs();
@@ -1149,7 +1149,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     FLOORS.forEach(function(f){
       var list = dayBookings(f.id, iso);
       var addBtn = document.getElementById('addAll-'+f.id);
-      if(addBtn) addBtn.onclick = function(){ renderFormView(iso, f.id, null); };
+      if(addBtn) addBtn.onclick = function(){ renderFormView(iso, f.id, null, true); };
       list.forEach(function(b){
         var suf = '-af'+f.id;
         var rcptBtn = document.getElementById('rcpt-'+b.id+suf);
@@ -1157,7 +1157,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var relBtn = document.getElementById('rel-'+b.id+suf);
         var cancelBtn = document.getElementById('can-'+b.id+suf);
         if(rcptBtn) rcptBtn.onclick = function(){ renderReceiptView(iso, f.id, b, false); };
-        if(editBtn) editBtn.onclick = function(){ renderFormView(iso, f.id, b); };
+        if(editBtn) editBtn.onclick = function(){ renderFormView(iso, f.id, b, true); };
         if(relBtn) relBtn.onclick = function(){ renderReleaseView(iso, f.id, b); };
         if(cancelBtn) cancelBtn.onclick = function(){ handleCancelBooking(iso, f.id, b.id); };
       });
@@ -1337,7 +1337,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     };
   }
 
-  function renderFormView(iso, ctxFloorId, existing){
+  function renderFormView(iso, ctxFloorId, existing, allFloorsMode){
     var b = existing || {};
     var isEdit = !!existing;
     var onSlots = slotsOn();
@@ -1347,12 +1347,18 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var baseFloor = num(b.totalAmount);
     var baseCleaning = num(b.cleaningCharge);
     var baseDeposit = num(b.sdAmount);
+    // Multiple floors can only be picked for a brand-new booking started from the
+    // "All Floors" page. Editing an existing multi-floor booking always shows its
+    // true floor list, regardless of which floor tab you opened it from.
+    var allowMultiFloor = !!allFloorsMode || isEdit;
 
-    var floorChoiceHtml = FLOORS.map(function(f){
-      var sel = selectedFloors.indexOf(f.id)!==-1;
-      var bookedElsewhere = isFloorBookedOnDate(f.id, iso, isEdit ? b.id : null) && !sel;
-      return '<div class="pick-opt'+(sel?' selected':'')+(bookedElsewhere?' disabled':'')+'" data-floor="'+f.id+'">'+f.label+(bookedElsewhere?' (booked)':'')+'</div>';
-    }).join('');
+    var floorChoiceHtml = allowMultiFloor
+      ? FLOORS.map(function(f){
+          var sel = selectedFloors.indexOf(f.id)!==-1;
+          var bookedElsewhere = isFloorBookedOnDate(f.id, iso, isEdit ? b.id : null) && !sel;
+          return '<div class="pick-opt'+(sel?' selected':'')+(bookedElsewhere?' disabled':'')+'" data-floor="'+f.id+'">'+f.label+(bookedElsewhere?' (booked)':'')+'</div>';
+        }).join('')
+      : '<div class="pick-opt selected" data-floor="'+ctxFloorId+'">'+floorLabel(ctxFloorId)+'</div>';
 
     var eventOptionsHtml = EVENT_TYPES.map(function(e){
       return '<option value="'+e+'" '+(b.eventType===e?'selected':'')+'>'+e+'</option>';
@@ -1365,7 +1371,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<button class="close-btn" id="mClose">&times;</button>'+
       '</div>'+
       '<div class="field"><label>Floor(s)</label><div class="pick-choice" id="floorChoice">'+floorChoiceHtml+'</div>'+
-      '<p class="hint" style="margin-top:6px;">Select more than one to book floors together for the same event. Already-booked floors are greyed out.</p></div>'+
+      (allowMultiFloor ? '<p class="hint" style="margin-top:6px;">Select more than one to book floors together for the same event. Already-booked floors are greyed out.</p>' : '<p class="hint" style="margin-top:6px;">To book more than one floor together, start the booking from the All Floors page.</p>')+'</div>'+
       (onSlots ? '<div class="field"><label>Time slot</label><div class="pick-choice" id="slotChoice"></div></div><p class="err" id="floorSlotWarn" style="display:none;">No common time slot is free across the floors you selected. Try a different combination.</p>' : '')+
       '<div class="field"><label>Event / purpose</label><select id="fEventType">'+eventOptionsHtml+'</select></div>'+
       '<div class="field" id="fEventOtherWrap" style="'+(b.eventType==='Other'?'':'display:none;')+'"><label>Please specify</label><input type="text" id="fEventOther" value="'+attr(b.eventTypeOther)+'" placeholder="Describe the event"></div>'+
@@ -1460,22 +1466,24 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       updateAutoAmounts();
     }
 
-    document.querySelectorAll('#floorChoice .pick-opt').forEach(function(opt){
-      opt.onclick = function(){
-        if(opt.classList.contains('disabled')) return;
-        var fid = opt.getAttribute('data-floor');
-        var idx = selectedFloors.indexOf(fid);
-        if(idx>-1){
-          if(selectedFloors.length===1) return;
-          selectedFloors.splice(idx,1);
-          opt.classList.remove('selected');
-        } else {
-          selectedFloors.push(fid);
-          opt.classList.add('selected');
-        }
-        if(onSlots) renderSlotChoiceUI(); else updateAutoAmounts();
-      };
-    });
+    if(allowMultiFloor){
+      document.querySelectorAll('#floorChoice .pick-opt').forEach(function(opt){
+        opt.onclick = function(){
+          if(opt.classList.contains('disabled')) return;
+          var fid = opt.getAttribute('data-floor');
+          var idx = selectedFloors.indexOf(fid);
+          if(idx>-1){
+            if(selectedFloors.length===1) return;
+            selectedFloors.splice(idx,1);
+            opt.classList.remove('selected');
+          } else {
+            selectedFloors.push(fid);
+            opt.classList.add('selected');
+          }
+          if(onSlots) renderSlotChoiceUI(); else updateAutoAmounts();
+        };
+      });
+    }
 
     var eventSelect = document.getElementById('fEventType');
     var otherWrap = document.getElementById('fEventOtherWrap');
