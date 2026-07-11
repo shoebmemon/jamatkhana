@@ -71,9 +71,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 }
 .signout-icon:hover { background: rgba(247,243,232,0.25); }
 
-/* Quick Access Overview Tabs */
+/* Quick Access Overview Tabs (Now Inside Header) */
 .quick-nav-row {
-  display: flex; gap: 8px; margin-top: 12px;
+  position: relative; /* ensures it sits above the star background */
+  display: flex; gap: 8px; margin-top: 20px;
   flex-wrap: nowrap; overflow-x: auto;
   -webkit-overflow-scrolling: touch; padding-bottom: 4px;
   scrollbar-width: none; justify-content: flex-start;
@@ -82,12 +83,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
 .quick-nav-tab {
   font-family: 'Work Sans', sans-serif; font-size: 12.5px; font-weight: 600;
-  padding: 8px 14px; border-radius: 999px; background: var(--surface);
-  border: 1px solid var(--line); color: var(--ink-soft);
+  padding: 8px 14px; border-radius: 999px; 
+  background: rgba(247,243,232,0.1); 
+  border: 1px solid rgba(247,243,232,0.28); 
+  color: #F1EDE0;
   cursor: pointer; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
   transition: all 0.15s ease;
 }
-.quick-nav-tab:hover { border-color: var(--gold); color: var(--teal-dark); }
+.quick-nav-tab:hover { background: rgba(247,243,232,0.2); color: #fff; border-color: rgba(247,243,232,0.5); }
 
 /* Centered, Gradient Tabs */
 .floor-row { 
@@ -291,12 +294,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .balance-note b{color:var(--teal-dark);}
 
 /* Overview modal specifics */
-.tab-row{display:flex; gap:4px; margin-top:14px; border-bottom:1px solid var(--line); overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch; padding-bottom:4px;}
-.ov-tab{
-  font-size:13px; font-weight:600; color:var(--ink-soft); padding:10px 12px; cursor:pointer;
-  border-bottom:2px solid transparent; display:inline-block;
-}
-.ov-tab.active{color:var(--teal-dark); border-bottom-color:var(--gold);}
 .ov-panel{margin-top:14px;}
 .search-result{
   display:flex; justify-content:space-between; align-items:center; gap:10px;
@@ -479,6 +476,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         <p class="eyebrow">Booking Register</p>
         <h1>Jamat Khana Booking</h1>
       </div>
+      <!-- Modern Sign Out Icon -->
       <button class="signout-icon" id="logoutBtn" title="Sign out">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -487,18 +485,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         </svg>
       </button>
     </div>
+    
+    <!-- Quick Access Overview Tabs Inside Header -->
+    <div class="quick-nav-row" id="quickNavRow">
+      <div class="quick-nav-tab" data-tab="search">Search</div>
+      <div class="quick-nav-tab" data-tab="day">Day view</div>
+      <div class="quick-nav-tab" data-tab="all">All bookings</div>
+      <div class="quick-nav-tab" data-tab="upcoming">Upcoming</div>
+      <div class="quick-nav-tab" data-tab="accounts">Accounts</div>
+      <div class="quick-nav-tab" data-tab="settings">Settings</div>
+      <div class="quick-nav-tab" data-tab="export">Export</div>
+    </div>
   </div>
   
-  <div class="quick-nav-row" id="quickNavRow">
-    <div class="quick-nav-tab" data-tab="search">Search</div>
-    <div class="quick-nav-tab" data-tab="day">Day view</div>
-    <div class="quick-nav-tab" data-tab="all">All bookings</div>
-    <div class="quick-nav-tab" data-tab="upcoming">Upcoming</div>
-    <div class="quick-nav-tab" data-tab="accounts">Accounts</div>
-    <div class="quick-nav-tab" data-tab="settings">Settings</div>
-    <div class="quick-nav-tab" data-tab="export">Export</div>
-  </div>
-
   <div class="floor-row" id="floorRow"></div>
 
   <div class="card">
@@ -732,7 +731,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     tabs.forEach(function(f){
       var btn = document.createElement('button');
       btn.className = 'floor-tab' + (state.currentFloor===f.id ? ' active' : '');
-      btn.innerHTML = f.label;
+      btn.innerHTML = f.label; // Dot has been successfully removed from "All Floors"
       btn.onclick = function(){ state.currentFloor = f.id; renderFloorTabs(); renderCalendar(); };
       row.appendChild(btn);
     });
@@ -1502,7 +1501,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     if(ok){ renderCalendar(); renderDayView(iso, floorId); }
   }
 
-  // ---------- Overview modal: search / upcoming / export ----------
+  // ---------- Quick Nav modales: search / upcoming / export ----------
   var overlayOv = document.getElementById('overlayOv');
   var modalOv = document.getElementById('modalOv');
   var ovState = { tab:'search' };
@@ -1511,8 +1510,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   // Open specific overview tab directly from the quick access row
   document.querySelectorAll('.quick-nav-tab').forEach(function(btn){
     btn.onclick = function(){ 
-      ovState.tab = btn.getAttribute('data-tab'); 
-      renderOverview(); 
+      var tabId = btn.getAttribute('data-tab');
+      renderOverview(tabId); 
       overlayOv.classList.add('show'); 
     };
   });
@@ -1534,40 +1533,35 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     return out;
   }
 
-  function renderOverview(){
+  function renderOverview(tabId){
+    ovState.tab = tabId;
+    
+    var titles = {
+      'search': 'Search',
+      'day': 'Day view',
+      'all': 'All bookings',
+      'upcoming': 'Upcoming',
+      'accounts': 'Accounts',
+      'settings': 'Settings',
+      'export': 'Export'
+    };
+    
     modalOv.innerHTML =
       '<div class="modal-head">'+
-        '<div><p class="modal-date">All floors</p><h2 class="modal-title">Overview &amp; search</h2></div>'+
+        '<div><p class="modal-date">Overview</p><h2 class="modal-title">' + (titles[tabId] || 'Overview') + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
       '</div>'+
-      '<div class="tab-row" id="ovTabs">'+
-        '<div class="ov-tab" data-tab="search">Search</div>'+
-        '<div class="ov-tab" data-tab="day">Day view</div>'+
-        '<div class="ov-tab" data-tab="all">All bookings</div>'+
-        '<div class="ov-tab" data-tab="upcoming">Upcoming</div>'+
-        '<div class="ov-tab" data-tab="accounts">Accounts</div>'+
-        '<div class="ov-tab" data-tab="settings">Settings</div>'+
-        '<div class="ov-tab" data-tab="export">Export</div>'+
-      '</div>'+
-      '<div class="ov-panel" id="ovPanel"></div>';
+      '<div class="ov-panel" id="ovPanel" style="margin-top:4px;"></div>';
+      
     document.getElementById('ovClose').onclick = function(){ overlayOv.classList.remove('show'); };
-    document.querySelectorAll('#ovTabs .ov-tab').forEach(function(t){
-      t.onclick = function(){ ovState.tab = t.getAttribute('data-tab'); renderOverviewPanel(); };
-    });
-    renderOverviewPanel();
-  }
-
-  function renderOverviewPanel(){
-    document.querySelectorAll('#ovTabs .ov-tab').forEach(function(t){
-      t.classList.toggle('active', t.getAttribute('data-tab')===ovState.tab);
-    });
+    
     var panel = document.getElementById('ovPanel');
-    if(ovState.tab==='search') renderSearchPanel(panel);
-    else if(ovState.tab==='day') renderDayLookupPanel(panel);
-    else if(ovState.tab==='all') renderAllBookingsPanel(panel);
-    else if(ovState.tab==='upcoming') renderUpcomingPanel(panel);
-    else if(ovState.tab==='accounts') renderAccountsPanel(panel);
-    else if(ovState.tab==='settings') renderSettingsPanel(panel);
+    if(tabId==='search') renderSearchPanel(panel);
+    else if(tabId==='day') renderDayLookupPanel(panel);
+    else if(tabId==='all') renderAllBookingsPanel(panel);
+    else if(tabId==='upcoming') renderUpcomingPanel(panel);
+    else if(tabId==='accounts') renderAccountsPanel(panel);
+    else if(tabId==='settings') renderSettingsPanel(panel);
     else renderExportPanel(panel);
   }
 
@@ -1762,9 +1756,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       balanceDue += balanceDueOf(b);
     });
     var sdHeld = sdCollected - sdReleased;
-    // Note: amountPaid already includes any deposit collected up front (Total (₹) on the
-    // booking form is floor charges + cleaning charge + deposit), so cash balance is simply
-    // the total received — adding sdHeld again would double-count the deposit portion.
     return {
       totalReceived:totalReceived, sdCollected:sdCollected, sdReleased:sdReleased,
       sdHeld:sdHeld, cashBalance:totalReceived, balanceDue:balanceDue, count:all.length
