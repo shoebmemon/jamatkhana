@@ -438,7 +438,24 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 @media (max-width:520px){
   /* Existing mobile layout fixes */
   .row2, .row3{grid-template-columns:1fr; gap:0;}
-  .summary-strip{grid-template-columns:repeat(2,1fr);}
+ /* Ultra-Compact 2x2 Grid */
+  .summary-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px; /* Reduced from 8px */
+    margin-bottom: 10px; /* Reduced bottom margin */
+  }
+  .summary-cell {
+    padding: 6px 8px; /* Tighter inner spacing */
+    border-radius: 8px; /* Slightly sharper corners to match tighter spacing */
+  }
+  .summary-cell .num {
+    font-size: 14px; /* Slightly smaller number */
+  }
+  .summary-cell .lbl {
+    font-size: 8.5px; /* Smaller label */
+    margin-top: 1px;
+    line-height: 1.1;
+  }
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
