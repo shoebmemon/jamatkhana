@@ -434,28 +434,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 @media (max-width:520px){
   /* Existing mobile layout fixes */
   .row2, .row3{grid-template-columns:1fr; gap:0;}
-
-  /* NEW: Single line horizontally scrollable summary strip */
-  .summary-strip {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 8px;
-    padding-bottom: 4px;
-  }
-  .summary-strip::-webkit-scrollbar { display: none; }
-  .summary-cell {
-    flex: 0 0 auto;
-    min-width: 130px;
-    padding: 10px;
-  }
-
-  /* NEW: Taller calendar blocks to fill up empty vertical screen space */
-  .day{aspect-ratio: auto; min-height: 12vh; justify-content: space-between;}
+  .summary-strip{grid-template-columns:repeat(2,1fr);}
+  .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
-  
   .acct-grid{grid-template-columns:1fr;}
   .bc-actions {flex-direction: column;}
   .bc-actions .btn {width: 100%;}
@@ -484,12 +465,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
 @media (max-width:380px) {
   .grid{gap:4px;}
-  /* Keep calendar blocks tall on very small screens too */
-  .day{border-radius:9px; padding:4px; min-height: 11vh;}
+  .day{border-radius:9px; padding:4px; min-height: 48px;}
   .day .num{font-size:11px;}
   .month-label{font-size:17px;}
-  /* Shrink summary cards slightly so they fit better horizontally */
-  .summary-cell { min-width: 115px; } 
   .summary-cell .num{font-size: 13.5px;}
 }
 </style>
@@ -529,7 +507,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         <p class="eyebrow">Booking Register</p>
         <h1>Jamat Khana Booking</h1>
       </div>
-      <!-- Aesthetic Sign Out Icon (Squircle shape, dynamic hover) -->
       <button class="signout-icon" id="logoutBtn" title="Sign out">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16 17l5-5-5-5"></path>
@@ -539,7 +516,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       </button>
     </div>
     
-    <!-- Quick Access Overview Tabs Inside Header -->
     <div class="quick-nav-row" id="quickNavRow">
       <div class="quick-nav-tab" data-tab="search">Search</div>
       <div class="quick-nav-tab" data-tab="day">Day view</div>
@@ -575,7 +551,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 </div>
 
 <div class="overlay" id="overlay"><div class="modal" id="modalBox"></div></div>
-<!-- Centered Modal for Quick Nav Tabs -->
 <div class="overlay" id="overlayOv"><div class="modal wide" id="modalOv"></div></div>
 <div id="printArea"></div>
 
