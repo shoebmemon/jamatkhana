@@ -592,6 +592,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 (function(){
@@ -1145,6 +1147,61 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     document.getElementById('printArea').innerHTML = '';
   });
 
+  // Renders the receipt off-screen at a fixed width, snapshots it with html2canvas,
+  // then wraps that snapshot in a single-page jsPDF sized to match — so the PDF looks
+  // exactly like the on-screen receipt rather than being reflowed into a generic page.
+  async function buildReceiptPdf(iso, floorId, b){
+    if(typeof html2canvas==='undefined' || typeof window.jspdf==='undefined'){
+      throw new Error('PDF tools did not load — check your internet connection and try again.');
+    }
+    var holder = document.createElement('div');
+    holder.style.position = 'fixed';
+    holder.style.left = '-9999px';
+    holder.style.top = '0';
+    holder.style.width = '380px';
+    holder.style.background = '#FEFCF6';
+    holder.style.padding = '16px';
+    holder.innerHTML = buildReceiptPaperHtml(iso, floorId, b);
+    document.body.appendChild(holder);
+    try{
+      var canvas = await html2canvas(holder, { scale:2, backgroundColor:'#FEFCF6', useCORS:true });
+      var imgData = canvas.toDataURL('image/png');
+      var jsPDF = window.jspdf.jsPDF;
+      var pxToMm = 0.264583;
+      var wMm = canvas.width * pxToMm / 2;
+      var hMm = canvas.height * pxToMm / 2;
+      var doc = new jsPDF({ orientation: hMm>wMm ? 'p' : 'l', unit:'mm', format:[wMm, hMm] });
+      doc.addImage(imgData, 'PNG', 0, 0, wMm, hMm);
+      return doc;
+    } finally {
+      document.body.removeChild(holder);
+    }
+  }
+
+  async function sharePdfReceipt(iso, floorId, b, btn){
+    var originalText = btn.textContent;
+    btn.textContent = 'Preparing PDF…';
+    btn.disabled = true;
+    try{
+      var doc = await buildReceiptPdf(iso, floorId, b);
+      var filename = 'Receipt-'+refCode(b)+'.pdf';
+      var blob = doc.output('blob');
+      var file = new File([blob], filename, { type:'application/pdf' });
+      if(navigator.canShare && navigator.canShare({ files:[file] })){
+        await navigator.share({ files:[file], title:'Booking receipt — '+refCode(b), text:'Booking receipt for '+b.name });
+      } else {
+        doc.save(filename);
+        alert('Your browser can\u2019t share files directly, so the PDF was downloaded instead — you can share it from your Downloads or Files app.');
+      }
+    } catch(e){
+      if(e && e.name==='AbortError') return; // person cancelled the native share sheet
+      alert('Could not create the PDF: '+e.message);
+    } finally {
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
+
   function renderReceiptView(iso, floorId, b, justCreated){
     var receiptHtml, waHref;
     try{
@@ -1175,12 +1232,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<button class="btn ghost" id="mBack">Back to day</button>'+
         '<button class="btn primary" id="mPrint">Print / Save as PDF</button>'+
       '</div>'+
-      '<a class="btn whatsapp block" id="waLink" target="_blank" rel="noopener">Share on WhatsApp</a>'+
-      '<p class="hint">Opens the booker\u2019s WhatsApp chat with the confirmation pre-filled — just press send.</p>';
+      '<button class="btn primary block" id="mSharePdf" style="margin-top:10px;">Share PDF</button>'+
+      '<a class="btn whatsapp block" id="waLink" target="_blank" rel="noopener" style="margin-top:10px;">Share on WhatsApp</a>'+
+      '<p class="hint">"Share PDF" opens your phone\u2019s share sheet with the receipt as a PDF file — send it via WhatsApp, email, or anywhere else. "Share on WhatsApp" opens the booker\u2019s chat with the confirmation pre-filled as text — just press send.</p>';
 
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mBack').onclick = function(){ renderDayView(iso, floorId); };
     document.getElementById('mPrint').onclick = function(){ printReceipt(iso, floorId, b); };
+    document.getElementById('mSharePdf').onclick = function(){ sharePdfReceipt(iso, floorId, b, document.getElementById('mSharePdf')); };
     document.getElementById('waLink').href = waHref;
   }
 
