@@ -842,6 +842,29 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   }
 
   function dayBookings(floorId, iso){ return (state.data[floorId] && state.data[floorId][iso]) || []; }
+  // For an "all floors on this day" view: a booking spanning multiple floors is stored
+  // under each of those floors, so naively looping floors and listing dayBookings would
+  // show the same booking two or three times. This groups things once per day so callers
+  // can render multi-floor bookings a single time, separate from single-floor ones.
+  function dayBookingsForAllFloors(iso){
+    var seenMulti = {};
+    var multi = [];
+    var perFloor = {};
+    FLOORS.forEach(function(f){
+      var full = dayBookings(f.id, iso);
+      var singles = [];
+      full.forEach(function(b){
+        var floors = bookingFloors(b, f.id);
+        if(floors.length > 1){
+          if(!seenMulti[b.id]){ seenMulti[b.id] = true; multi.push({ b:b, floorId:floors[0] }); }
+        } else {
+          singles.push(b);
+        }
+      });
+      perFloor[f.id] = { full:full, singles:singles };
+    });
+    return { multi:multi, perFloor:perFloor };
+  }
   function takenSlots(list){ return list.map(function(b){ return b.slot || 'full'; }); }
   function isFullyBooked(list){
     if(list.length===0) return false;
@@ -1233,9 +1256,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<button class="btn primary" id="mPrint">Print / Save as PDF</button>'+
       '</div>'+
       '<button class="btn primary block" id="mSharePdf" style="margin-top:10px;">Share PDF</button>'+
-      '<p class="hint" style="margin-top:6px;">Opens your phone\u2019s share sheet with the receipt as a PDF. To send it on WhatsApp, choose WhatsApp from that sheet, then pick <b>'+escapeHtml(b.name)+'</b> (<b>'+escapeHtml(b.mobile)+'</b>) as the chat — WhatsApp doesn\u2019t let apps preselect the contact for a file, so this last step is manual.</p>'+
-      '<a class="btn whatsapp block" id="waLink" target="_blank" rel="noopener" style="margin-top:10px;">Share on WhatsApp</a>'+
-      '<p class="hint">This opens the booker\u2019s chat directly with the confirmation pre-filled as text — just press send. (It can\u2019t attach the PDF itself; use "Share PDF" above for that.)</p>';
+      '<a class="btn whatsapp block" id="waLink" target="_blank" rel="noopener" style="margin-top:10px;">Share on WhatsApp</a>';
 
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mBack').onclick = function(){ renderDayView(iso, floorId); };
@@ -1299,18 +1320,29 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   }
 
   function renderAllFloorsDayView(iso){
+    var grouped = dayBookingsForAllFloors(iso);
+
+    var multiCardsHtml = grouped.multi.map(function(e){ return bookingCardHtml(e.b, e.floorId, '-afm'); }).join('');
+    var multiSection = grouped.multi.length
+      ? '<div style="margin-top:16px;">'+
+          '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">Multi-floor bookings</p>'+
+          multiCardsHtml+
+        '</div>'
+      : '';
+
     var allFull = true;
     var sectionsHtml = FLOORS.map(function(f){
-      var list = dayBookings(f.id, iso);
-      var full = slotsOn() ? isFullyBooked(list) : (list.length>0);
+      var g = grouped.perFloor[f.id];
+      var full = slotsOn() ? isFullyBooked(g.full) : (g.full.length>0);
       if(!full) allFull = false;
-      var cardsHtml = list.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('');
-      var openMsg = (!full && list.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p>' : '';
+      var cardsHtml = g.singles.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('');
+      var openMsg = (!full && g.full.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p>' : '';
+      var multiNote = (!full && g.full.length>0 && g.singles.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Booked as part of a multi-floor event — see above.</p>' : '';
       var fullMsg = full ? '<p class="hint" style="margin:4px 0 10px;">'+f.label+' is fully booked for this day.</p>' : '';
       var addBtn = full ? '' : '<button class="btn add block" id="addAll-'+f.id+'">+ Add booking on '+f.label+'</button>';
       return '<div style="margin-top:16px;">'+
         '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">'+f.label+'</p>'+
-        cardsHtml+openMsg+fullMsg+addBtn+'</div>';
+        cardsHtml+openMsg+multiNote+fullMsg+addBtn+'</div>';
     }).join('');
 
     modalBox.innerHTML =
@@ -1319,15 +1351,26 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<button class="close-btn" id="mClose">&times;</button>'+
       '</div>'+
       (allFull ? '<p class="hint" style="margin-top:10px;font-weight:600;">All floors are booked for this day.</p>' : '')+
-      sectionsHtml;
+      multiSection+sectionsHtml;
 
     document.getElementById('mClose').onclick = closeModal;
 
+    grouped.multi.forEach(function(e){
+      var b = e.b, f = e.floorId, suf = '-afm';
+      var rcptBtn = document.getElementById('rcpt-'+b.id+suf);
+      var editBtn = document.getElementById('edit-'+b.id+suf);
+      var relBtn = document.getElementById('rel-'+b.id+suf);
+      var cancelBtn = document.getElementById('can-'+b.id+suf);
+      if(rcptBtn) rcptBtn.onclick = function(){ renderReceiptView(iso, f, b, false); };
+      if(editBtn) editBtn.onclick = function(){ renderFormView(iso, f, b, true); };
+      if(relBtn) relBtn.onclick = function(){ renderReleaseView(iso, f, b); };
+      if(cancelBtn) cancelBtn.onclick = function(){ handleCancelBooking(iso, f, b.id); };
+    });
+
     FLOORS.forEach(function(f){
-      var list = dayBookings(f.id, iso);
       var addBtn = document.getElementById('addAll-'+f.id);
       if(addBtn) addBtn.onclick = function(){ renderFormView(iso, f.id, null, true); };
-      list.forEach(function(b){
+      grouped.perFloor[f.id].singles.forEach(function(b){
         var suf = '-af'+f.id;
         var rcptBtn = document.getElementById('rcpt-'+b.id+suf);
         var editBtn = document.getElementById('edit-'+b.id+suf);
@@ -2135,38 +2178,51 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var iso = document.getElementById('dayLookupInput').value;
     var el = document.getElementById('dayLookupResults');
     if(!iso){ el.innerHTML = ''; return; }
-    el.innerHTML = '<p class="hint" style="margin-top:12px; font-size:13px;">'+fmtDateLabel(iso)+'</p>' +
-      FLOORS.map(function(f){
-        var list = dayBookings(f.id, iso);
-        var body = list.length
-          ? list.map(function(b){ return dayLookupCardHtml(f.id, iso, b); }).join('')
-          : '<p class="empty-note" style="padding:6px 0;">Open — no bookings on this floor.</p>';
-        return '<div style="margin-top:14px;">'+
-          '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">'+f.label+'</p>'+
-          body+'</div>';
-      }).join('');
+    var grouped = dayBookingsForAllFloors(iso);
 
+    var multiHtml = grouped.multi.length
+      ? '<div style="margin-top:14px;">'+
+          '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">Multi-floor bookings</p>'+
+          grouped.multi.map(function(e){ return dayLookupCardHtml(e.floorId, iso, e.b, '-afm'); }).join('')+
+        '</div>'
+      : '';
+
+    var floorsHtml = FLOORS.map(function(f){
+      var singles = grouped.perFloor[f.id].singles;
+      var body = singles.length
+        ? singles.map(function(b){ return dayLookupCardHtml(f.id, iso, b, '-af'+f.id); }).join('')
+        : '<p class="empty-note" style="padding:6px 0;">'+(grouped.perFloor[f.id].full.length ? 'Booked as part of a multi-floor event — see above.' : 'Open — no bookings on this floor.')+'</p>';
+      return '<div style="margin-top:14px;">'+
+        '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">'+f.label+'</p>'+
+        body+'</div>';
+    }).join('');
+
+    el.innerHTML = '<p class="hint" style="margin-top:12px; font-size:13px;">'+fmtDateLabel(iso)+'</p>' + multiHtml + floorsHtml;
+
+    function wireManageBtn(f, b, suf){
+      var btn = document.getElementById('manage-'+b.id+suf);
+      if(btn) btn.onclick = function(){
+        state.currentFloor = f;
+        var d = new Date(iso+'T00:00:00');
+        state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
+        renderFloorTabs(); renderCalendar();
+        animateCard();
+        overlayOv.classList.remove('show');
+        openDayModal(iso, f);
+      };
+    }
+    grouped.multi.forEach(function(e){ wireManageBtn(e.floorId, e.b, '-afm'); });
     FLOORS.forEach(function(f){
-      dayBookings(f.id, iso).forEach(function(b){
-        var btn = document.getElementById('manage-'+b.id);
-        if(btn) btn.onclick = function(){
-          state.currentFloor = f.id;
-          var d = new Date(iso+'T00:00:00');
-          state.viewYear = d.getFullYear(); state.viewMonth = d.getMonth();
-          renderFloorTabs(); renderCalendar();
-          animateCard();
-          overlayOv.classList.remove('show');
-          openDayModal(iso, f.id);
-        };
-      });
+      grouped.perFloor[f.id].singles.forEach(function(b){ wireManageBtn(f.id, b, '-af'+f.id); });
     });
   }
 
-  function dayLookupCardHtml(floorId, iso, b){
+  function dayLookupCardHtml(floorId, iso, b, idSuffix){
+    idSuffix = idSuffix || '';
     var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
     var balance = balanceDueOf(b);
     var floors = bookingFloors(b, floorId);
-    var floorsNote = floors.length>1 ? ' · with '+floors.filter(function(id){return id!==floorId;}).map(function(id){return floorLabel(id);}).join(' + ') : '';
+    var floorsNote = floors.length>1 ? ' · '+combinedFloorLabel(b, floorId) : '';
     var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
     return '<div class="booking-card" style="margin-top:8px;">'+
       '<div class="bc-head">'+
@@ -2175,7 +2231,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Billing complete':'Pending')+'</span>'+
       '</div>'+
       '<div class="bc-rows">'+ bcRow('Balance due', money(balance), true) +'</div>'+
-      '<div class="bc-actions"><button class="btn ghost" id="manage-'+b.id+'">Manage this booking</button></div>'+
+      '<div class="bc-actions"><button class="btn ghost" id="manage-'+b.id+idSuffix+'">Manage this booking</button></div>'+
     '</div>';
   }
 
