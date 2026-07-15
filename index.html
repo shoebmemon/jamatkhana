@@ -1417,8 +1417,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
     var floors = bookingFloors(b, floorId);
     var floorLines = (floors.length>1 && b.floorCharges)
-      ? floors.map(function(fid){ return { label: floorLabel(fid)+' Charges', amount: num(b.floorCharges[fid]) }; })
-      : [{ label: floorLabel(floors[0]||floorId)+' Charges', amount: num(b.totalAmount) }];
+      ? floors.map(function(fid){ return { label: floorLabel(fid), amount: num(b.floorCharges[fid]) }; })
+      : [{ label: floorLabel(floors[0]||floorId), amount: num(b.totalAmount) }];
     var floorTotal = floorLines.reduce(function(sum, r){ return sum + r.amount; }, 0);
     var cleaning = num(b.cleaningCharge);
     var totalCharges = floorTotal + cleaning;
