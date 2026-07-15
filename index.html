@@ -1438,8 +1438,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       'Event: '+(eventLabel||'—')+'\n\n'+
       floorLines.map(function(r){ return r.label+': '+money(r.amount)+'\n'; }).join('')+
       'Cleaning Charges: '+money(cleaning)+'\n'+
-      'Total Charges: '+money(totalCharges)+'\n'+
-      'Add: Security Deposit: '+money(deposit)+'\n'+
+      'Total: '+money(totalCharges)+'\n'+
+      'Add: S.D.: '+money(deposit)+'\n'+
       'Total (Incl. S.D.): '+money(totalInclSd)+'\n'+
       'Amount Paid: '+money(paid)+'\n';
     if(balanceAtBooking>0) text += 'Balance Due: '+money(balanceAtBooking)+'\n';
@@ -1500,7 +1500,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var floorLbl = combinedFloorLabel(b, floorId);
     var elecDesc = elecUnitsDesc(b);
     var f = finalBillBreakdown(b, floorId);
-    var floorLines = f.floorLines.map(function(r){ return r.label+': '+money(r.amount)+'\n'; }).join('');
+    // f.floorLines is shared with the HTML receipt/PDF (labeled "[Floor] Charge") — turn
+    // that into "[Floor] Charges" here only, for the WhatsApp text, without touching that shared data.
+    var floorLines = f.floorLines.map(function(r){ return r.label.replace(/ Charge$/,' Charges')+': '+money(r.amount)+'\n'; }).join('');
     var text = 'Jamat Khana Final Bill\n'+
       'Ref: '+refCode(b)+'\n\n'+
       'Dear '+b.name+',\n'+
@@ -1510,18 +1512,18 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       (slotLabelOf(b) ? 'Slot: '+slotLabelOf(b)+'\n' : '')+
       'Event: '+(eventLabel||'—')+'\n\n'+
       floorLines+
-      'Cleaning Charge: '+money(f.cleaning)+'\n';
+      'Cleaning Charges: '+money(f.cleaning)+'\n';
     if(f.elec) text += 'Electricity'+(elecDesc?' ('+elecDesc+')':'')+': '+money(f.elec)+'\n';
     if(f.itemsTotal){
       f.itemLines.forEach(function(it){ text += it.name+' ('+it.qty+' × ₹'+it.rate+'): '+money(it.amount)+'\n'; });
     }
     if(f.penalty) text += 'Penalty'+(b.penaltyReason?' ('+b.penaltyReason+')':'')+': '+money(f.penalty)+'\n';
-    text += 'Total Charges: '+money(f.totalCharges)+'\n'+
+    text += 'Total: '+money(f.totalCharges)+'\n'+
       'S.D. Released: − '+money(f.deposit)+'\n'+
-      'Amount paid till now (excl. S.D.): − '+money(f.paidExclSd)+'\n';
+      'Amount Paid (excl. S.D.): − '+money(f.paidExclSd)+'\n';
     if(f.balance>0) text += 'Balance Due: '+money(f.balance)+'\n';
-    else if(f.refundDue>0) text += 'Refund Due to Customer: '+money(f.refundDue)+'\n';
-    else if(b.sdReleased && f.refundsPaid>0) text += 'Refund Paid to Customer: '+money(f.refundsPaid)+'\n';
+    else if(f.refundDue>0) text += 'Refund Due: '+money(f.refundDue)+'\n';
+    else if(b.sdReleased && f.refundsPaid>0) text += 'Refund Paid: '+money(f.refundsPaid)+'\n';
     else text += 'Balance Due: '+money(0)+'\n';
     text += '\nPlease keep this message for your reference. Thank you!';
     return text;
