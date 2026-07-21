@@ -76,12 +76,17 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   border: 1px solid rgba(247,243,232,0.28);
   color: #F1EDE0;
   cursor: pointer; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-  transition: all 0.15s ease;
+  transition: background 0.05s linear, border-color 0.05s linear, color 0.05s linear, box-shadow 0.15s ease, transform 0.15s ease;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
-.quick-nav-tab:hover { background: rgba(247,243,232,0.2); color: #fff; border-color: rgba(247,243,232,0.5); transform:translateY(-1px); }
+.quick-nav-tab:hover, .quick-nav-tab:focus-visible { background: rgba(247,243,232,0.2); color: #fff; border-color: rgba(247,243,232,0.85); box-shadow: 0 4px 10px rgba(0,0,0,0.08); transform: translateY(-1px) translateZ(0); }
+.quick-nav-tab:active { background: rgba(247,243,232,0.28); border-color: rgba(247,243,232,0.95); transform: translateY(0) translateZ(0); }
 
 .quick-nav-tab.logout { color: #EFA69D; }
-.quick-nav-tab.logout:hover { background: var(--rose); color: #fff; border-color: var(--rose); }
+.quick-nav-tab.logout:hover, .quick-nav-tab.logout:focus-visible { background: var(--rose); color: #fff; border-color: var(--rose); }
+.quick-nav-tab.logout:active { background: var(--rose); border-color: var(--rose); }
 
 /* Centered, Gradient Tabs */
 .floor-row {
@@ -236,9 +241,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 /* Default Modal (Day View) -> slides up */
 .modal{
   background:var(--surface); border-radius:20px 20px 0 0; max-width:480px; width:100%;
-  max-height:92vh; overflow-y:auto; padding:24px 16px 40px; box-shadow:0 -10px 40px rgba(10,25,25,0.25);
+  overflow:hidden; box-shadow:0 -10px 40px rgba(10,25,25,0.25);
   animation: slideUp 0.25s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+  display:flex; flex-direction:column;
 }
+.modal-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; max-height:92vh; padding:24px 16px 40px; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 /* Centered Modal (Quick Nav Tabs) -> pops in the center */
@@ -307,6 +314,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .csel-opt-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
 .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+.row4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px;}
 
 .pick-choice{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
 .pick-opt{
@@ -488,6 +496,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   }
   .modal {
     border-radius: 16px;
+  }
+  .modal-scroll {
     max-height: 88vh;
     padding: 24px;
   }
@@ -496,7 +506,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 /* Updated Mobile Media Query */
 @media (max-width:520px){
   /* Existing mobile layout fixes */
-  .row2, .row3{grid-template-columns:1fr; gap:14px;}
+  .row2, .row3, .row4{grid-template-columns:1fr; gap:14px;}
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
@@ -614,7 +624,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       <div class="quick-nav-tab" data-tab="all">All bookings</div>
       <div class="quick-nav-tab" data-tab="upcoming">Upcoming</div>
       <div class="quick-nav-tab" data-tab="accounts">Accounts</div>
-      <div class="quick-nav-tab" data-tab="settings">Settings</div>
+      <div class="quick-nav-tab" data-tab="settings">Default Rates</div>
       <div class="quick-nav-tab" data-tab="export">Export</div>
       <div class="quick-nav-tab logout" id="logoutBtn">Logout</div>
     </div>
@@ -643,8 +653,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   <p class="footer-note" id="footerNote">Loading bookings…</p>
 </div>
 
-<div class="overlay" id="overlay"><div class="modal" id="modalBox"></div></div>
-<div class="overlay" id="overlayOv"><div class="modal wide" id="modalOv"></div></div>
+<div class="overlay" id="overlay"><div class="modal" id="modalBox"><div class="modal-scroll" id="modalBoxInner"></div></div></div>
+<div class="overlay" id="overlayOv"><div class="modal wide" id="modalOv"><div class="modal-scroll" id="modalOvInner"></div></div></div>
 <div class="overlay confirm-overlay" id="overlayConfirm"><div class="modal confirm-modal" id="modalConfirm"></div></div>
 <div id="printArea"></div>
 
@@ -1618,7 +1628,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       receiptHtml = builders.html(iso, floorId, b);
       waHref = 'https://wa.me/'+normalizePhone(b.mobile)+'?text='+encodeURIComponent(builders.text(iso, floorId, b));
     }catch(e){
-      modalBox.innerHTML =
+      modalBoxInner.innerHTML =
         '<div class="modal-head">'+
           '<div><p class="modal-date">'+builders.title+'</p><h2 class="modal-title">Something went wrong</h2></div>'+
           '<button class="close-btn" id="mClose">&times;</button>'+
@@ -1631,7 +1641,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       return;
     }
 
-    modalBox.innerHTML =
+    modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+(justCreated?'Booking confirmed':builders.title)+'</p>'+
         '<h2 class="modal-title">'+(mode==='final'?'Final settlement slip':'Confirmation slip')+'</h2></div>'+
@@ -1668,7 +1678,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   // ---------- Day modal: list of bookings + add ----------
   var overlay = document.getElementById('overlay');
   var modalBox = document.getElementById('modalBox');
-  function closeModal(){ overlay.classList.remove('show'); modalBox.innerHTML=''; }
+  var modalBoxInner = document.getElementById('modalBoxInner');
+  function closeModal(){ overlay.classList.remove('show'); modalBoxInner.innerHTML=''; }
   overlay.addEventListener('click', function(e){ if(e.target===overlay) closeModal(); });
 
   // ---------- App-styled confirm dialog (replaces native confirm()) ----------
@@ -1718,14 +1729,30 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var avail = slotsOn() ? availableSlots(list) : [];
     var addLabel = (slotsOn() && avail.length) ? '+ Add booking ('+avail.map(function(s){return s.label;}).join(' / ')+' available)' : '+ Add booking';
 
-    modalBox.innerHTML =
+    var fullMsg = '';
+    if(full && list.length){
+      var coveredFloors = [floorId];
+      if(list.length===1){
+        var bf = bookingFloors(list[0], floorId);
+        if(bf.length>1) coveredFloors = bf;
+      }
+      if(coveredFloors.length >= FLOORS.length){
+        fullMsg = 'This day is booked for all floors';
+      } else if(coveredFloors.length===2){
+        fullMsg = 'This day is booked for '+coveredFloors.map(floorLabel).join(' and ');
+      } else {
+        fullMsg = 'This day is booked for '+floorLabel(coveredFloors[0]);
+      }
+    }
+
+    modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+' · '+floorLabel(floorId)+'</p>'+
         '<h2 class="modal-title">'+(list.length? 'Booking for this day' : 'No booking yet')+'</h2></div>'+
         '<button class="close-btn" id="mClose">&times;</button>'+
       '</div>'+
       (cardsHtml || '<p class="hint">This day is open on '+floorLabel(floorId)+'.</p>')+
-      (full ? (list.length ? '<p class="hint" style="margin-top:14px;">'+floorLabel(floorId)+' is fully booked for this day.</p>' : '') : '<button class="btn add block" id="mAdd">'+addLabel+'</button>');
+      (full ? (fullMsg ? '<p class="hint" style="margin-top:14px;">'+fullMsg+'.</p>' : '') : '<button class="btn add block" id="mAdd">'+addLabel+'</button>');
 
     document.getElementById('mClose').onclick = closeModal;
     var addBtn = document.getElementById('mAdd');
@@ -1772,7 +1799,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         cardsHtml+openMsg+multiNote+fullMsg+addBtn+'</div>';
     }).join('');
 
-    modalBox.innerHTML =
+    modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+'</p><h2 class="modal-title">All floors</h2></div>'+
         '<button class="close-btn" id="mClose">&times;</button>'+
@@ -1860,7 +1887,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     else if(advanceHeld>0) chargeRows += bcRow('Advance / Excess Held', money(advanceHeld), true);
     else chargeRows += bcRow('Balance Due', money(0), true);
 
-    modalBox.innerHTML =
+    modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+' · '+combinedFloorLabel(b, floorId)+'</p>'+
         '<h2 class="modal-title">Booking details</h2></div>'+
@@ -1909,7 +1936,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       '</div>';
     }).join('') : '<p class="hint" style="margin:0;">No rental items configured yet — add some in Settings.</p>';
 
-    modalBox.innerHTML =
+    modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+' · '+floorLabel(floorId)+'</p>'+
         '<h2 class="modal-title">Final billing</h2></div>'+
@@ -2092,7 +2119,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var onSlots = slotsOn();
     var selectedFloors = isEdit ? bookingFloors(b, ctxFloorId).slice() : [ctxFloorId];
     var selectedSlot = onSlots ? (isEdit ? (b.slot || 'full') : null) : null;
-    var autoFlags = { total:true, cleaning:true, deposit:true };
+    var autoFlags = { total:true, cleaning:!isEdit, deposit:!isEdit };
     var baseFloor = num(b.totalAmount);
     var baseCleaning = num(b.cleaningCharge);
     var baseDeposit = num(b.sdAmount);
@@ -2133,7 +2160,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       return '<option value="'+e+'" '+(b.eventType===e?'selected':'')+'>'+e+'</option>';
     }).join('');
 
-    modalBox.innerHTML =
+    modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+'</p>'+
         '<h2 class="modal-title">'+(isEdit?'Edit booking':'New booking')+'</h2></div>'+
@@ -2204,13 +2231,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     }
 
     function updateAutoAmounts(){
-      if(!isEdit){
-        var cleaningInput = document.getElementById('fCleaningCharge');
-        var sdInput = document.getElementById('fSdAmount');
-        var defaults = computeDefaultAmounts();
-        if(autoFlags.cleaning){ cleaningInput.value = defaults.cleaning || ''; baseCleaning = defaults.cleaning; }
-        if(autoFlags.deposit){ sdInput.value = defaults.deposit || ''; baseDeposit = defaults.deposit; }
-      }
+      var cleaningInput = document.getElementById('fCleaningCharge');
+      var sdInput = document.getElementById('fSdAmount');
+      var defaults = computeDefaultAmounts();
+      if(autoFlags.cleaning){ cleaningInput.value = defaults.cleaning || ''; baseCleaning = defaults.cleaning; }
+      if(autoFlags.deposit){ sdInput.value = defaults.deposit || ''; baseDeposit = defaults.deposit; }
       renderFloorChargeSection();
       applyPaidAllocation();
     }
@@ -2305,6 +2330,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
             selectedFloors.push(fid);
             opt.classList.add('selected');
           }
+          autoFlags.cleaning = true;
+          autoFlags.deposit = true;
           if(onSlots) renderSlotChoiceUI(); else updateAutoAmounts();
         };
       });
@@ -2350,12 +2377,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mCancelForm').onclick = function(){ renderDayView(iso, ctxFloorId); };
     document.getElementById('mSave').onclick = async function(){
+      var saveBtn = document.getElementById('mSave');
+      if(saveBtn.disabled) return;
+
       var name = document.getElementById('fName').value.trim();
       var mobile = document.getElementById('fMobile').value.trim();
       if(!name || !mobile || selectedFloors.length===0 || (onSlots && !selectedSlot)){
         document.getElementById('fErr').style.display = 'block';
         return;
       }
+
+      saveBtn.disabled = true;
+      var originalLabel = saveBtn.textContent;
+      saveBtn.textContent = isEdit ? 'Saving…' : 'Confirming…';
 
       var floorCharges = {};
       selectedFloors.forEach(function(fid){ floorCharges[fid] = num(floorChargeVals[fid]); });
@@ -2416,6 +2450,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var contextFloor = record.floors.indexOf(ctxFloorId)!==-1 ? ctxFloorId : record.floors[0];
         if(wasNew) renderReceiptView(iso, contextFloor, record, true);
         else renderDayView(iso, contextFloor);
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.textContent = originalLabel;
       }
     };
   }
@@ -2440,6 +2477,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   // ---------- Quick nav modals: search / upcoming / export ----------
   var overlayOv = document.getElementById('overlayOv');
   var modalOv = document.getElementById('modalOv');
+  var modalOvInner = document.getElementById('modalOvInner');
   var ovState = { tab:'search' };
   overlayOv.addEventListener('click', function(e){ if(e.target===overlayOv) overlayOv.classList.remove('show'); });
 
@@ -2478,11 +2516,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       'all': 'All bookings',
       'upcoming': 'Upcoming',
       'accounts': 'Accounts',
-      'settings': 'Settings',
+      'settings': 'Default Rates',
       'export': 'Export'
     };
 
-    modalOv.innerHTML =
+    modalOvInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">Overview</p><h2 class="modal-title">' + (titles[tabId] || 'Overview') + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
@@ -2568,7 +2606,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '</div>';
       };
     } else if(type === 'deposit'){
-      title = 'Deposits pending (' + monthName + ')';
+      title = 'Deposits (' + monthName + ')';
       filtered = bookings.filter(function(item){ return !item.b.sdReleased && num(item.b.sdAmount) > 0; });
       renderItem = function(item){
         return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
@@ -2582,7 +2620,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       ? '<p class="empty-note">No records found for this category in ' + monthName + '.</p>'
       : filtered.map(renderItem).join('');
 
-    modalOv.innerHTML =
+    modalOvInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">Summary breakdown</p><h2 class="modal-title">' + title + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
@@ -2625,7 +2663,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       return (item.b.name||'').toLowerCase().indexOf(query)!==-1 || (item.b.mobile||'').indexOf(query)!==-1;
     }) : [];
     matches.sort(function(a,b){ return a.iso.localeCompare(b.iso); });
-    if(!query){ resultsEl.innerHTML = '<p class="empty-note">Type a name or mobile number to search across all floors and months.</p>'; return; }
+    if(!query){ resultsEl.innerHTML = ''; return; }
     if(matches.length===0){ resultsEl.innerHTML = '<p class="empty-note">No bookings found.</p>'; return; }
     resultsEl.innerHTML = matches.map(function(item){
       return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
@@ -3765,27 +3803,24 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       '<div class="booking-card" style="margin-top:0; display:none;">'+
         '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">'+
           '<input type="checkbox" id="setSlotsEnabled" '+(on?'checked':'')+' style="width:18px;height:18px;margin-top:2px;accent-color:var(--teal);flex:none;">'+
-          '<span><b style="color:var(--teal-dark);">Enable Morning / Evening / Full Day time slots</b><br>'+
-          '<span class="hint" style="margin:2px 0 0;display:block;">Off by default — each floor takes one full-day booking per date. Turn this on if you ever need to split a day into morning and evening functions.</span></span>'+
+          '<span><b style="color:var(--teal-dark);">Enable Morning / Evening / Full Day time slots</b></span>'+
         '</label>'+
       '</div>'+
       FLOORS.map(function(f){
         var s = state.settings[f.id] || {};
+        var rowClass = on ? 'row4' : 'row3';
         return '<div class="booking-card" style="margin-top:10px;">'+
           '<p class="bc-name" style="margin:0 0 8px;">'+f.label+'</p>'+
-          '<div class="row2">'+
+          '<div class="'+rowClass+'">'+
             '<div class="field" style="margin-top:0;"><label id="lbl-fullDay-'+f.id+'">'+(on?'Full day (₹)':'Booking charge (₹)')+'</label><input type="number" id="set-'+f.id+'-fullDay" value="'+attr(s.fullDay)+'" placeholder="0"></div>'+
             '<div class="field half-day-field" id="halfDayWrap-'+f.id+'" style="margin-top:0;'+(on?'':'display:none;')+'"><label>Half day (₹)</label><input type="number" id="set-'+f.id+'-halfDay" value="'+attr(s.halfDay)+'" placeholder="0"></div>'+
-          '</div>'+
-          '<div class="row2" style="margin-top:10px;">'+
             '<div class="field" style="margin-top:0;"><label>Cleaning charge (₹)</label><input type="number" id="set-'+f.id+'-cleaning" value="'+attr(s.cleaning)+'" placeholder="0"></div>'+
             '<div class="field" style="margin-top:0;"><label>Deposit (₹)</label><input type="number" id="set-'+f.id+'-deposit" value="'+attr(s.deposit)+'" placeholder="0"></div>'+
           '</div>'+
         '</div>';
       }).join('')+
       '<div class="booking-card" style="margin-top:10px;">'+
-        '<p class="bc-name" style="margin:0 0 4px;">Multi-floor deposit</p>'+
-        '<p class="hint" style="margin:0 0 10px;">When a booking covers two floors, or all three floors together, use these lower deposit amounts instead of adding up each floor\u2019s individual deposit. Leave a box blank to keep adding the floors\u2019 deposits together as before.</p>'+
+        '<p class="bc-name" style="margin:0 0 10px;">Multi-floor deposit</p>'+
         '<div class="row2">'+
           '<div class="field" style="margin-top:0;"><label>Any 2 floors together (₹)</label><input type="number" id="set-pkg-two" value="'+attr(pkgTwo)+'" placeholder="e.g. 5000"></div>'+
           '<div class="field" style="margin-top:0;"><label>All 3 floors together (₹)</label><input type="number" id="set-pkg-three" value="'+attr(pkgThree)+'" placeholder="e.g. 5000"></div>'+
@@ -3793,17 +3828,14 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       '</div>'+
       '<div class="booking-card" style="margin-top:10px;">'+
         '<p class="bc-name" style="margin:0 0 8px;">Items on rent</p>'+
-        '<p class="hint" style="margin:0 0 10px;">Add items like chairs, tables, and blankets with a rate per piece. At Final Billing you\u2019ll enter how many of each were used, and the total is added to the bill.</p>'+
         '<div id="rentalItemsList"></div>'+
         '<button type="button" class="btn ghost" id="addItemBtn" style="margin-top:10px;">+ Add item</button>'+
       '</div>'+
       '<div class="booking-card" style="margin-top:10px;">'+
         '<p class="bc-name" style="margin:0 0 8px;">Electricity</p>'+
         '<div class="field" style="margin-top:0;"><label>Rate per unit (₹)</label><input type="number" id="set-elecRate" value="'+attr(elecRate)+'" placeholder="e.g. 10"></div>'+
-        '<p class="hint" style="margin:8px 0 0;">Used at Final Billing with the opening and closing meter readings to calculate the electricity charge automatically.</p>'+
       '</div>'+
-      '<button class="btn primary block" id="saveSettingsBtn">Save settings</button>'+
-      '<p class="hint">When time slots are on, Half day rate applies to Morning and Evening bookings, and Full day blocks the whole date. Cleaning charge is added on top of the booking charge as a separate line. When a booking covers more than one floor, each floor\u2019s rates are added together for the default total, unless overridden by the multi-floor deposit above.</p>';
+      '<button class="btn primary block" id="saveSettingsBtn">Save settings</button>';
 
     function itemRowHtml(item, idx){
       return '<div class="item-row" data-idx="'+idx+'">'+
