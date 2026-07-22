@@ -266,7 +266,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
 .modal-date{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px; }
 .confirm-overlay{ z-index:200; }
-.confirm-modal{ max-width:400px; }
+.confirm-modal{ max-width:480px; }
 .modal-title{font-family:'Marcellus', serif; font-size:19px; color:var(--teal-dark); margin:0;}
 .close-btn{ background:none; border:none; font-size:28px; color:var(--ink-soft); cursor:pointer; line-height:1; padding:4px 12px; min-height:44px; display:flex; align-items:center; transition:color 0.15s ease; }
 .close-btn:hover{color:var(--rose);}
@@ -501,6 +501,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     max-height: 88vh;
     padding: 24px;
   }
+  .confirm-modal {
+    max-width: 400px;
+  }
 }
 
 /* Updated Mobile Media Query */
@@ -655,7 +658,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
 <div class="overlay" id="overlay"><div class="modal" id="modalBox"><div class="modal-scroll" id="modalBoxInner"></div></div></div>
 <div class="overlay" id="overlayOv"><div class="modal wide" id="modalOv"><div class="modal-scroll" id="modalOvInner"></div></div></div>
-<div class="overlay confirm-overlay" id="overlayConfirm"><div class="modal confirm-modal" id="modalConfirm"></div></div>
+<div class="overlay confirm-overlay" id="overlayConfirm"><div class="modal confirm-modal" id="modalConfirm"><div class="modal-scroll" id="modalConfirmInner"></div></div></div>
 <div id="printArea"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -727,7 +730,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         { name:'Gadda', rate:'50' }
       ]
     },
-    currentFloor: 'ground',
+    currentFloor: 'all',
     viewYear: new Date().getFullYear(),
     viewMonth: new Date().getMonth(),
     loaded: false,
@@ -1199,7 +1202,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   function renderFloorTabs(){
     var row = document.getElementById('floorRow');
     row.innerHTML = '';
-    var tabs = FLOORS.concat([{id:'all', label:'All Floors'}]);
+    var tabs = [{id:'all', label:'All Floors'}].concat(FLOORS);
     tabs.forEach(function(f){
       var btn = document.createElement('button');
       btn.className = 'floor-tab' + (state.currentFloor===f.id ? ' active' : '');
@@ -1684,7 +1687,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
   // ---------- App-styled confirm dialog (replaces native confirm()) ----------
   var overlayConfirm = document.getElementById('overlayConfirm');
-  var modalConfirm = document.getElementById('modalConfirm');
+  var modalConfirm = document.getElementById('modalConfirmInner');
   var confirmResolver = null;
   function resolveConfirm(val){
     overlayConfirm.classList.remove('show');
@@ -3988,7 +3991,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var diff = touchEndX - touchStartX;
     if(Math.abs(diff) < swipeThreshold) return;
 
-    var tabOrder = ['ground', 'first', 'second', 'all'];
+    var tabOrder = ['all', 'ground', 'first', 'second'];
     var currentIndex = tabOrder.indexOf(state.currentFloor);
     if(currentIndex === -1) currentIndex = 0;
 
