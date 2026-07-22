@@ -262,6 +262,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   from { opacity: 0; transform: scale(0.95) translateY(15px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+.ov-back-footer{ display:none; }
 
 .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
 .modal-date{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px; }
@@ -516,6 +517,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .cashbook-grid{grid-template-columns:1fr;}
   .bc-actions {flex-direction: column;}
   .bc-actions .btn {width: 100%;}
+
+  /* All bookings / Upcoming list rows: put event type on its own wrapping line below the phone number */
+  .search-result .sr-left .m{ display:block; }
+  .search-result .sr-left .ev-sep{ display:none; }
+  .search-result .sr-left .ev{ display:block; margin-top:2px; font-family:'Work Sans', sans-serif; font-size:12px; white-space:normal; }
+
+  /* Overview modal (All bookings, Search, Upcoming, Accounts, Default Rates, Export) -> same popup style as the booking modal, with a sticky Back button */
+  .ov-back-footer{
+    display:block; position:sticky; bottom:0; left:-16px; right:-16px;
+    margin:20px -16px -40px; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:var(--surface); border-top:1px solid var(--line);
+  }
+  .ov-back-footer .btn{ width:100%; }
 
   /* Compact Mobile Header */
   .header {
@@ -2493,6 +2507,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     };
   });
 
+  function combinedFloorLabel(floors){
+    if(floors.length >= FLOORS.length) return 'All Floors';
+    return floors.map(function(id){return floorLabel(id);}).join(' + ');
+  }
+
   function uniqueBookingsFlat(){
     var seen = {};
     var out = [];
@@ -2503,7 +2522,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
           if(seen[b.id]) return;
           seen[b.id] = true;
           var floors = bookingFloors(b, f.id);
-          out.push({ iso:iso, floorIds:floors, floorLabel: floors.map(function(id){return floorLabel(id);}).join(' + '), b:b });
+          out.push({ iso:iso, floorIds:floors, floorLabel: combinedFloorLabel(floors), b:b });
         });
       });
     });
@@ -2528,9 +2547,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<div><p class="modal-date">Overview</p><h2 class="modal-title">' + (titles[tabId] || 'Overview') + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
       '</div>'+
-      '<div class="ov-panel" id="ovPanel" style="margin-top:4px;"></div>';
+      '<div class="ov-panel" id="ovPanel" style="margin-top:4px;"></div>'+
+      '<div class="ov-back-footer"><button class="btn ghost" id="ovBack">&lsaquo; Back</button></div>';
 
     document.getElementById('ovClose').onclick = function(){ overlayOv.classList.remove('show'); };
+    document.getElementById('ovBack').onclick = function(){ overlayOv.classList.remove('show'); };
 
     var panel = document.getElementById('ovPanel');
     if(tabId==='search') renderSearchPanel(panel);
@@ -2558,7 +2579,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         if(d.getFullYear()===y && d.getMonth()===m){
           bookings[iso].forEach(function(b){
             var floors = bookingFloors(b, state.currentFloor);
-            out.push({ iso:iso, floorIds:floors, floorLabel: floors.map(function(id){return floorLabel(id);}).join(' + '), b:b });
+            out.push({ iso:iso, floorIds:floors, floorLabel: combinedFloorLabel(floors), b:b });
           });
         }
       });
@@ -2628,9 +2649,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<div><p class="modal-date">Summary breakdown</p><h2 class="modal-title">' + title + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
       '</div>'+
-      '<div class="ov-panel" style="margin-top:4px;">' + panelHtml + '</div>';
+      '<div class="ov-panel" style="margin-top:4px;">' + panelHtml + '</div>'+
+      '<div class="ov-back-footer"><button class="btn ghost" id="ovBack">&lsaquo; Back</button></div>';
 
     document.getElementById('ovClose').onclick = function(){ overlayOv.classList.remove('show'); };
+    document.getElementById('ovBack').onclick = function(){ overlayOv.classList.remove('show'); };
 
     modalOv.querySelectorAll('.search-result').forEach(function(row){
       row.onclick = function(){
@@ -2793,7 +2816,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
         var balance = balanceDueOf(b);
         return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
-          '<div class="sr-left"><div class="n">'+escapeHtml(b.name)+'</div><div class="m">'+escapeHtml(b.mobile)+' · '+escapeHtml(eventLabel||'')+'</div></div>'+
+          '<div class="sr-left"><div class="n">'+escapeHtml(b.name)+'</div><div class="m"><span class="ph">'+escapeHtml(b.mobile)+'</span><span class="ev-sep"> · </span><span class="ev">'+escapeHtml(eventLabel||'')+'</span></div></div>'+
           '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+(slotLabelOf(b)?' · '+slotLabelOf(b):'')+
           '<br><span class="bc-pill '+(b.sdReleased?'released':'pending')+'" style="margin-top:4px;display:inline-block;">'+money(balance)+' due</span></div>'+
         '</div>';
@@ -2824,7 +2847,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     panel.innerHTML = all.map(function(item){
       var eventLabel = item.b.eventType==='Other' ? (item.b.eventTypeOther||'Other') : item.b.eventType;
       return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
-        '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m">'+escapeHtml(eventLabel||'')+'</div></div>'+
+        '<div class="sr-left"><div class="n">'+escapeHtml(item.b.name)+'</div><div class="m"><span class="ev">'+escapeHtml(eventLabel||'')+'</span></div></div>'+
         '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+(slotLabelOf(item.b)?' · '+slotLabelOf(item.b):'')+'</div>'+
       '</div>';
     }).join('');
