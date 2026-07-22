@@ -315,6 +315,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   border:1px solid var(--line); border-radius:12px; padding:14px; margin-top:12px; background:var(--bg);
 }
 .bc-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+.bc-top-row{display:flex; justify-content:flex-start; margin-bottom:6px;}
+.bc-info{min-width:0;}
 .bc-slot{
   font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:0.05em; text-transform:uppercase;
   background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:2px 9px; color:var(--teal-dark);
@@ -328,6 +330,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 }
 .bc-pill.pending{background:var(--gold-soft); color:#7A5B14; border:1px solid var(--gold-line);}
 .bc-pill.released{background:var(--green-soft); color:var(--green); border:1px solid #BFD2C0;}
+.bc-pill.balance-due{background:var(--rose-soft); color:var(--rose); border:1px solid var(--rose);}
 .bc-rows{margin-top:8px;}
 .bc-row{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--line); gap:10px;}
 .bc-row:last-child{border-bottom:none;}
@@ -504,6 +507,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .confirm-modal {
     max-width: 400px;
   }
+  .search-result .sr-left .m{ display:block; }
+  .search-result .sr-left .ev-sep{ display:none; }
+  .search-result .sr-left .ev{ display:block; margin-top:2px; font-family:'Work Sans', sans-serif; font-size:12.5px; white-space:normal; }
 }
 
 /* Updated Mobile Media Query */
@@ -1743,11 +1749,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
     var fullMsg = '';
     if(full && list.length){
-      var coveredFloors = [floorId];
-      if(list.length===1){
-        var bf = bookingFloors(list[0], floorId);
-        if(bf.length>1) coveredFloors = bf;
-      }
+      var allData = dayBookingsForAllFloors(iso);
+      var coveredFloors = FLOORS.filter(function(f){
+        var g = allData.perFloor[f.id];
+        return slotsOn() ? isFullyBooked(g.full) : (g.full.length>0);
+      }).map(function(f){ return f.id; });
+      if(coveredFloors.indexOf(floorId)===-1) coveredFloors.push(floorId);
+
       if(coveredFloors.length >= FLOORS.length){
         fullMsg = 'This day is booked for all floors';
       } else if(coveredFloors.length===2){
@@ -1804,11 +1812,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       var cardsHtml = g.singles.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('');
       var openMsg = (!full && g.full.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p>' : '';
       var multiNote = (!full && g.full.length>0 && g.singles.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Booked as part of a multi-floor event — see above.</p>' : '';
-      var fullMsg = full ? '<p class="hint" style="margin:4px 0 10px;">'+f.label+' is fully booked for this day.</p>' : '';
       var addBtn = full ? '' : '<button class="btn add block" id="addAll-'+f.id+'">+ Add booking on '+f.label+'</button>';
+      // If this floor is fully covered by a multi-floor booking already shown above, and there's
+      // nothing else (no singles, no open/add prompt) to show here, skip the section entirely.
+      if(!cardsHtml && !openMsg && !multiNote && !addBtn) return '';
       return '<div style="margin-top:16px;">'+
         '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">'+f.label+'</p>'+
-        cardsHtml+openMsg+multiNote+fullMsg+addBtn+'</div>';
+        cardsHtml+openMsg+multiNote+addBtn+'</div>';
     }).join('');
 
     modalBoxInner.innerHTML =
@@ -1851,16 +1861,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
 
     var settlementPending = b.sdReleased && (s.balance>0 || s.refundDue>0);
-    var pillClass = !b.sdReleased ? 'pending' : (settlementPending ? 'pending' : 'released');
-    var pillText = !b.sdReleased ? 'Final billing pending' : (settlementPending ? (s.refundDue>0 ? 'Refund pending' : 'Balance pending') : 'Billing complete');
+    var balanceOwed = settlementPending && s.refundDue<=0 && s.balance>0;
+    var pillClass = !b.sdReleased ? 'pending' : (balanceOwed ? 'balance-due' : (settlementPending ? 'pending' : 'released'));
+    var pillText = !b.sdReleased ? 'Final billing pending' : (settlementPending ? (s.refundDue>0 ? 'Refund pending' : 'Balance pending') : 'Fully Paid & Settled');
 
     return '<div class="booking-card">'+
-      '<div class="bc-head">'+
-        '<div>'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
-        '<div class="bc-event">'+escapeHtml(eventLabel||'—')+' · '+escapeHtml(b.mobile)+'</div>'+
-        floorsNote+
-        '</div>'+
-        '<span class="bc-pill '+pillClass+'">'+pillText+'</span>'+
+      '<div class="bc-top-row"><span class="bc-pill '+pillClass+'">'+pillText+'</span></div>'+
+      '<div class="bc-info">'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
+      '<div class="bc-event">'+escapeHtml(eventLabel||'—')+' · '+escapeHtml(b.mobile)+'</div>'+
+      floorsNote+
       '</div>'+
       '<div class="bc-actions">'+
         '<button class="btn ghost" id="det-'+b.id+idSuffix+'">Booking details</button>'+
@@ -2756,11 +2765,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var floors = bookingFloors(b, floorId);
     var floorsNote = floors.length>1 ? ' · '+combinedFloorLabel(b, floorId) : '';
     var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
+    var pillClass = balance>0 ? 'balance-due' : (b.sdReleased ? 'released' : 'pending');
+    var pillText = balance>0 ? 'Balance due' : (b.sdReleased ? 'Fully Paid & Settled' : 'Pending');
     return '<div class="booking-card" style="margin-top:8px;">'+
       '<div class="bc-head">'+
         '<div>'+slotBadge+'<div class="bc-name">'+escapeHtml(b.name)+'</div>'+
         '<div class="bc-event">'+escapeHtml(eventLabel||'—')+' · '+escapeHtml(b.mobile)+floorsNote+'</div></div>'+
-        '<span class="bc-pill '+(b.sdReleased?'released':'pending')+'">'+(b.sdReleased?'Billing complete':'Pending')+'</span>'+
+        '<span class="bc-pill '+pillClass+'">'+pillText+'</span>'+
       '</div>'+
       '<div class="bc-rows">'+ bcRow('Balance due', money(balance), true) +'</div>'+
       '<div class="bc-actions"><button class="btn ghost" id="manage-'+b.id+idSuffix+'">Manage this booking</button></div>'+
@@ -2801,10 +2812,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var b = item.b;
         var eventLabel = b.eventType==='Other' ? (b.eventTypeOther||'Other') : b.eventType;
         var balance = balanceDueOf(b);
+        var pillClass = balance>0 ? 'balance-due' : (b.sdReleased ? 'released' : 'pending');
         return '<div class="search-result" data-iso="'+item.iso+'" data-floor="'+item.floorIds[0]+'">'+
           '<div class="sr-left"><div class="n">'+escapeHtml(b.name)+'</div><div class="m"><span class="ph">'+escapeHtml(b.mobile)+'</span><span class="ev-sep"> · </span><span class="ev">'+escapeHtml(eventLabel||'')+'</span></div></div>'+
           '<div class="sr-right">'+fmtDateLabel(item.iso).split(',').slice(0,2).join(',')+'<br>'+item.floorLabel+(slotLabelOf(b)?' · '+slotLabelOf(b):'')+
-          '<br><span class="bc-pill '+(b.sdReleased?'released':'pending')+'" style="margin-top:4px;display:inline-block;">'+money(balance)+' due</span></div>'+
+          '<br><span class="bc-pill '+pillClass+'" style="margin-top:4px;display:inline-block;">'+money(balance)+' due</span></div>'+
         '</div>';
       }).join('');
 
