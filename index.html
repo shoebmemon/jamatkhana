@@ -248,21 +248,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .modal-scroll{ overflow-y:auto; -webkit-overflow-scrolling:touch; max-height:92vh; padding:24px 16px 40px; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-/* Centered Modal (Quick Nav Tabs) -> pops in the center */
-#overlayOv {
-  align-items: center;
-  padding: 16px;
-}
-#modalOv {
-  border-radius: 20px;
-  animation: popIn 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
-  max-width: 600px;
-}
-@keyframes popIn {
-  from { opacity: 0; transform: scale(0.95) translateY(15px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-.ov-back-footer{ display:none; }
+
 
 .modal-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
 .modal-date{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 2px; }
@@ -489,7 +475,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   body.printing .receipt-paper::before{ border-color:#999; }
 }
 
-/* Desktop Modals Styling rule fallback */
+/* Desktop Modals Styling fallback */
 @media (min-width: 521px) {
   .overlay {
     align-items: center;
@@ -497,6 +483,19 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   }
   .modal {
     border-radius: 16px;
+    animation: modalRise 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center center;
+  }
+  .overlay.show {
+    animation: overlayFade 0.25s ease;
+  }
+  @keyframes overlayFade {
+    from { background: rgba(10,25,25,0); }
+    to   { background: rgba(10,25,25,0.55); }
+  }
+  @keyframes modalRise {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
   }
   .modal-scroll {
     max-height: 88vh;
@@ -522,14 +521,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .search-result .sr-left .m{ display:block; }
   .search-result .sr-left .ev-sep{ display:none; }
   .search-result .sr-left .ev{ display:block; margin-top:2px; font-family:'Work Sans', sans-serif; font-size:12px; white-space:normal; }
-
-  /* Overview modal (All bookings, Search, Upcoming, Accounts, Default Rates, Export) -> same popup style as the booking modal, with a sticky Back button */
-  .ov-back-footer{
-    display:block; position:sticky; bottom:0; left:-16px; right:-16px;
-    margin:20px -16px -40px; padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-    background:var(--surface); border-top:1px solid var(--line);
-  }
-  .ov-back-footer .btn{ width:100%; }
 
   /* Compact Mobile Header */
   .header {
@@ -1241,7 +1232,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     return f ? f.label : (id||'');
   }
   function bookingFloors(b, fallbackFloorId){ return (b && b.floors && b.floors.length) ? b.floors : [fallbackFloorId]; }
-  function combinedFloorLabel(b, fallbackFloorId){ return bookingFloors(b, fallbackFloorId).map(function(id){ return floorLabel(id); }).join(' + '); }
+  function combinedFloorLabel(b, fallbackFloorId){
+    var floors = bookingFloors(b, fallbackFloorId);
+    if(floors.length >= FLOORS.length) return 'All Floors';
+    return floors.map(function(id){ return floorLabel(id); }).join(' + ');
+  }
 
   // ---------- Month summary ----------
   function summaryCell(num, lbl, id){
@@ -1852,7 +1847,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var s = settlementSummary(b);
     var eventLabel = b.eventType === 'Other' ? (b.eventTypeOther || 'Other') : b.eventType;
     var floors = bookingFloors(b, floorId);
-    var floorsNote = floors.length>1 ? '<div class="bc-event" style="margin-top:2px;">Booked together on: '+floors.map(function(id){return floorLabel(id);}).join(' + ')+'</div>' : '';
+    var floorsNote = floors.length>1 ? '<div class="bc-event" style="margin-top:2px;">Booked together on: '+combinedFloorLabel(b, floorId)+'</div>' : '';
     var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
 
     var settlementPending = b.sdReleased && (s.balance>0 || s.refundDue>0);
@@ -2507,11 +2502,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     };
   });
 
-  function combinedFloorLabel(floors){
-    if(floors.length >= FLOORS.length) return 'All Floors';
-    return floors.map(function(id){return floorLabel(id);}).join(' + ');
-  }
-
   function uniqueBookingsFlat(){
     var seen = {};
     var out = [];
@@ -2522,7 +2512,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
           if(seen[b.id]) return;
           seen[b.id] = true;
           var floors = bookingFloors(b, f.id);
-          out.push({ iso:iso, floorIds:floors, floorLabel: combinedFloorLabel(floors), b:b });
+          out.push({ iso:iso, floorIds:floors, floorLabel: combinedFloorLabel(b, f.id), b:b });
         });
       });
     });
@@ -2547,11 +2537,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<div><p class="modal-date">Overview</p><h2 class="modal-title">' + (titles[tabId] || 'Overview') + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
       '</div>'+
-      '<div class="ov-panel" id="ovPanel" style="margin-top:4px;"></div>'+
-      '<div class="ov-back-footer"><button class="btn ghost" id="ovBack">&lsaquo; Back</button></div>';
+      '<div class="ov-panel" id="ovPanel" style="margin-top:4px;"></div>';
 
     document.getElementById('ovClose').onclick = function(){ overlayOv.classList.remove('show'); };
-    document.getElementById('ovBack').onclick = function(){ overlayOv.classList.remove('show'); };
 
     var panel = document.getElementById('ovPanel');
     if(tabId==='search') renderSearchPanel(panel);
@@ -2579,7 +2567,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         if(d.getFullYear()===y && d.getMonth()===m){
           bookings[iso].forEach(function(b){
             var floors = bookingFloors(b, state.currentFloor);
-            out.push({ iso:iso, floorIds:floors, floorLabel: combinedFloorLabel(floors), b:b });
+            out.push({ iso:iso, floorIds:floors, floorLabel: combinedFloorLabel(b, state.currentFloor), b:b });
           });
         }
       });
@@ -2649,11 +2637,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<div><p class="modal-date">Summary breakdown</p><h2 class="modal-title">' + title + '</h2></div>'+
         '<button class="close-btn" id="ovClose">&times;</button>'+
       '</div>'+
-      '<div class="ov-panel" style="margin-top:4px;">' + panelHtml + '</div>'+
-      '<div class="ov-back-footer"><button class="btn ghost" id="ovBack">&lsaquo; Back</button></div>';
+      '<div class="ov-panel" style="margin-top:4px;">' + panelHtml + '</div>';
 
     document.getElementById('ovClose').onclick = function(){ overlayOv.classList.remove('show'); };
-    document.getElementById('ovBack').onclick = function(){ overlayOv.classList.remove('show'); };
 
     modalOv.querySelectorAll('.search-result').forEach(function(row){
       row.onclick = function(){
@@ -4034,6 +4020,33 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       }
     }
   }
+
+  // --- Swipe left/right on any popup to close it (with an easier "edge swipe" like a native back gesture) ---
+  function attachSwipeToClose(modalEl, overlayEl){
+    if(!modalEl || !overlayEl) return;
+    var sx = 0, sy = 0, startedAtEdge = false;
+    var EDGE_ZONE = 28; // px from the left/right screen edge counted as an "edge swipe"
+    modalEl.addEventListener('touchstart', function(e){
+      var t = e.changedTouches[0];
+      sx = t.screenX; sy = t.screenY;
+      startedAtEdge = (sx <= EDGE_ZONE) || (sx >= window.innerWidth - EDGE_ZONE);
+    }, {passive:true});
+    modalEl.addEventListener('touchend', function(e){
+      var t = e.changedTouches[0];
+      var dx = t.screenX - sx;
+      var dy = t.screenY - sy;
+      // Edge swipes behave like a native back gesture: a short, deliberate flick is enough.
+      // Swipes starting elsewhere in the popup need a fuller, clearly horizontal swipe.
+      var threshold = startedAtEdge ? 32 : 45;
+      var slopeOk = startedAtEdge ? Math.abs(dx) > Math.abs(dy) : Math.abs(dx) > Math.abs(dy) * 1.5;
+      if(Math.abs(dx) > threshold && slopeOk){
+        overlayEl.classList.remove('show');
+      }
+    }, {passive:true});
+  }
+  attachSwipeToClose(document.getElementById('modalBox'), overlay);
+  attachSwipeToClose(document.getElementById('modalOv'), overlayOv);
+  attachSwipeToClose(document.getElementById('modalConfirm'), overlayConfirm);
 
   // ---------- Auth gate ----------
   var loginScreen = document.getElementById('loginScreen');
