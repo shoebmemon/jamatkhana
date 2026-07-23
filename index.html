@@ -299,9 +299,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .csel-check{ flex:none; width:14px; height:14px; color:var(--teal); opacity:0; display:flex; align-items:center; justify-content:center; }
 .csel-opt.selected .csel-check{ opacity:1; }
 .csel-opt-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-.row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
-.row4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px;}
+.row2{display:flex; flex-wrap:nowrap; gap:12px;}
+.row3{display:flex; flex-wrap:nowrap; gap:10px;}
+.row4{display:flex; flex-wrap:nowrap; gap:10px;}
+.row2 > .field, .row3 > .field, .row4 > .field{ flex:1 1 0; min-width:0; }
 
 .pick-choice{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
 .pick-opt{
@@ -334,13 +335,29 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .bc-rows{margin-top:8px;}
 .bc-row{display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--line); gap:10px;}
 .bc-row:last-child{border-bottom:none;}
-.bc-row .k{color:var(--ink-soft); flex-shrink:0;}
-.bc-row .v{font-weight:600; text-align:right; word-break:break-word;}
-.bc-row .v.mono{font-family:'IBM Plex Mono', monospace; font-weight:500;}
+.bc-row .k{color:var(--ink-soft); min-width:0;}
+.bc-row .v{font-weight:600; text-align:right; word-break:break-word; flex-shrink:0;}
+.bc-row .v.mono{font-family:'IBM Plex Mono', monospace; font-weight:500; white-space:nowrap;}
 .bc-row a{color:var(--teal); text-decoration:none; padding:4px 0; display:inline-block;}
 .bc-row a:hover{text-decoration:underline;}
 .bc-row.stacked{flex-direction:column; align-items:flex-start; gap:2px;}
 .bc-row.stacked .v{text-align:left;}
+
+/* Ledger "by booking" rows — 3-column layout: Date+Weekday / Name+Floor / Amount */
+.ledger-row{
+  display:grid; grid-template-columns:minmax(66px,86px) 1fr auto; gap:10px;
+  align-items:start; padding:9px 0; border-bottom:1px solid var(--line); font-size:12.5px;
+}
+.ledger-row:last-child{border-bottom:none;}
+.ledger-row .lr-col{min-width:0; display:flex; flex-direction:column; gap:2px; overflow-wrap:break-word;}
+.ledger-row .lr-main{color:var(--ink); font-weight:600; white-space:normal; overflow-wrap:break-word; word-break:break-word;}
+.ledger-row .lr-date .lr-main{font-weight:500;}
+.ledger-row .lr-sub{color:var(--ink-soft); font-size:10.5px; white-space:normal; overflow-wrap:break-word;}
+.ledger-row .lr-amt{
+  font-family:'IBM Plex Mono', monospace; font-weight:600; text-align:right;
+  white-space:nowrap; align-self:center;
+}
+.ledger-row .lr-amt-wrap{ flex-direction:row; align-items:center; justify-content:flex-end; gap:6px; align-self:center; }
 .bc-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
 
 .btn{
@@ -447,7 +464,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 .acct-card.clickable:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
 
 /* ---------- Cash account (Receipts / Payments) ---------- */
-.cashbook-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; align-items:start; }
+.cashbook-grid{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px; align-items:start; }
 .cashbook-col{ margin-top:0; }
 .cb-row{ flex-direction:column; align-items:stretch; gap:3px; }
 .cb-row .k{ white-space:normal; word-break:break-word; flex-shrink:1; }
@@ -510,12 +527,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   .search-result .sr-left .m{ display:block; }
   .search-result .sr-left .ev-sep{ display:none; }
   .search-result .sr-left .ev{ display:block; margin-top:2px; font-family:'Work Sans', sans-serif; font-size:12.5px; white-space:normal; }
+  .field label{ white-space:nowrap; font-size:10px; letter-spacing:0.03em; }
 }
 
 /* Updated Mobile Media Query */
 @media (max-width:520px){
   /* Existing mobile layout fixes */
-  .row2, .row3, .row4{grid-template-columns:1fr; gap:14px;}
+  .row2, .row3, .row4{flex-wrap:wrap; gap:14px;}
+  .row2 > .field, .row3 > .field, .row4 > .field{ flex:1 1 100%; }
+  .ledger-row{ grid-template-columns:62px 1fr auto; gap:8px; font-size:12px; }
   .day{aspect-ratio: auto; min-height:55px; justify-content: space-between;}
   .day .name{display:none;}
   .acct-grid{grid-template-columns:1fr;}
@@ -739,6 +759,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         { name:'Table', rate:'20' },
         { name:'Blanket', rate:'30' },
         { name:'Gadda', rate:'50' }
+      ],
+      fixedCharges: [
+        { name:'Generator Charges', rate:'1500' }
       ]
     },
     currentFloor: 'all',
@@ -891,6 +914,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var total = num(b.totalAmount) + num(b.cleaningCharge);
     if(b.elecCharges) total += num(b.elecCharges);
     if(b.inventoryCharges) total += num(b.inventoryCharges);
+    if(b.fixedChargesTotal) total += num(b.fixedChargesTotal);
     if(b.penalty) total += num(b.penalty);
     // Before Final Billing, the deposit still needs to be collected as part of the
     // booking payment, so it's included in what's expected to be paid. Once billing
@@ -919,7 +943,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   // already been paid, to land on what's still owed — or owed back.
   function settlementSummary(b){
     var deposit = depositDisplayOf(b);
-    var grandTotal = num(b.totalAmount) + num(b.cleaningCharge) + num(b.elecCharges) + num(b.inventoryCharges) + num(b.penalty) + deposit;
+    var grandTotal = num(b.totalAmount) + num(b.cleaningCharge) + num(b.elecCharges) + num(b.inventoryCharges) + num(b.fixedChargesTotal) + num(b.penalty) + deposit;
     return {
       deposit: deposit,
       grandTotal: grandTotal,
@@ -949,6 +973,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         rate = match ? num(match.rate) : 0;
       }
       return { name:name, qty:qty, rate:rate, amount:qty*rate };
+    });
+  }
+  // Fixed charges (e.g. Generator Charges): flat rate for the whole booking, not
+  // quantity-based like rental items. b.fixedChargesSelected is a map of name -> rate
+  // captured at the time billing was finalized (so later Settings edits don't retroactively
+  // change an already-billed booking).
+  function fixedChargesDesc(b){
+    return (b.fixedChargesSelected && Object.keys(b.fixedChargesSelected).length)
+      ? Object.keys(b.fixedChargesSelected).join(', ')
+      : '';
+  }
+  function fixedChargeLines(b){
+    if(!b.fixedChargesSelected || !Object.keys(b.fixedChargesSelected).length) return [];
+    return Object.keys(b.fixedChargesSelected).map(function(name){
+      return { name:name, rate:num(b.fixedChargesSelected[name]), amount:num(b.fixedChargesSelected[name]) };
     });
   }
   function elecUnitsDesc(b){
@@ -999,17 +1038,20 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var elec = num(b.elecCharges);
     var itemLines = inventoryItemLines(b);
     var itemsTotal = itemLines.reduce(function(sum, it){ return sum + it.amount; }, 0);
+    var fixedLines = fixedChargeLines(b);
+    var fixedTotal = fixedLines.reduce(function(sum, it){ return sum + it.amount; }, 0);
     var penalty = num(b.penalty);
-    var totalCharges = floorTotal + cleaning + elec + itemsTotal + penalty;
+    var totalCharges = floorTotal + cleaning + elec + itemsTotal + fixedTotal + penalty;
     var deposit = num(b.sdAmount);
     var paidExclSd = totalPaidOf(b) - deposit;
     var refundsPaid = num(b.refundsPaid||0);
     var netBalance = (totalCharges - deposit - paidExclSd) + refundsPaid; // = totalCharges - totalPaid + refundsPaid
     return {
       floorLines: floorLines, cleaning: cleaning, elec: elec, itemLines: itemLines, itemsTotal: itemsTotal,
+      fixedLines: fixedLines, fixedTotal: fixedTotal,
       penalty: penalty,
       totalCharges: totalCharges, deposit: deposit, paidExclSd: paidExclSd, refundsPaid: refundsPaid,
-      balance: Math.max(netBalance, 0), refundDue: Math.max(-netBalance, 0)
+      balance: Math.max(netBalance, 0), refundDue: b.sdReleased ? Math.max(-netBalance, 0) : 0
     };
   }
 
@@ -1064,6 +1106,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         { name:'Table', rate:'20' },
         { name:'Blanket', rate:'30' },
         { name:'Gadda', rate:'50' }
+      ],
+      fixedCharges: [
+        { name:'Generator Charges', rate:'1500' }
       ]
     };
     FLOORS.forEach(function(f){ s[f.id] = {fullDay:'',halfDay:'',cleaning:'',deposit:''}; });
@@ -1088,6 +1133,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       merged.packageThreeFloorsDeposit = loaded.packageThreeFloorsDeposit !== undefined ? String(loaded.packageThreeFloorsDeposit) : '5000';
       merged.elecRate = loaded.elecRate !== undefined ? String(loaded.elecRate) : '';
       if(Array.isArray(loaded.inventoryItems)) merged.inventoryItems = loaded.inventoryItems;
+      if(Array.isArray(loaded.fixedCharges)) merged.fixedCharges = loaded.fixedCharges;
       state.settings = merged;
     }catch(e){
       console.error(e);
@@ -1494,6 +1540,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         return rpRow(escapeHtml(it.name)+' ('+it.qty+' × ₹'+it.rate+')', money(it.amount), true);
       }).join('');
     }
+    if(f.fixedTotal){
+      paymentRows += f.fixedLines.map(function(it){
+        return rpRow(escapeHtml(it.name), money(it.amount), true);
+      }).join('');
+    }
     if(f.penalty) paymentRows += rpRow('Penalty'+(b.penaltyReason?' ('+escapeHtml(b.penaltyReason)+')':''), money(f.penalty), true);
     paymentRows += rpRow('Total Charges', money(f.totalCharges), true) +
       rpRow('S.D. Released', '<span style="color:var(--rose);">− '+money(f.deposit)+'</span>', true) +
@@ -1543,6 +1594,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     if(f.elec) text += 'Electricity: '+money(f.elec)+'\n';
     if(f.itemsTotal){
       f.itemLines.forEach(function(it){ text += it.name+': '+money(it.amount)+'\n'; });
+    }
+    if(f.fixedTotal){
+      f.fixedLines.forEach(function(it){ text += it.name+': '+money(it.amount)+'\n'; });
     }
     if(f.penalty) text += 'Penalty'+(b.penaltyReason?' ('+b.penaltyReason+')':'')+': '+money(f.penalty)+'\n';
     text += 'Total: '+money(f.totalCharges)+'\n'+
@@ -1742,7 +1796,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
   function renderDayView(iso, floorId){
     var list = dayBookings(floorId, iso);
-    var cardsHtml = list.map(function(b){ return bookingCardHtml(b, floorId); }).join('');
+    var cardsHtml = list.map(function(b){ return bookingCardHtml(b, floorId, '', iso); }).join('');
     var full = slotsOn() ? isFullyBooked(list) : (list.length>0);
     var avail = slotsOn() ? availableSlots(list) : [];
     var addLabel = (slotsOn() && avail.length) ? '+ Add booking ('+avail.map(function(s){return s.label;}).join(' / ')+' available)' : '+ Add booking';
@@ -1789,7 +1843,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   function renderAllFloorsDayView(iso){
     var grouped = dayBookingsForAllFloors(iso);
 
-    var multiCardsHtml = grouped.multi.map(function(e){ return bookingCardHtml(e.b, e.floorId, '-afm'); }).join('');
+    var multiCardsHtml = grouped.multi.map(function(e){ return bookingCardHtml(e.b, e.floorId, '-afm', iso); }).join('');
     var multiSection = grouped.multi.length
       ? '<div style="margin-top:16px;">'+
           '<p style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 6px;">Multi-floor bookings</p>'+
@@ -1809,7 +1863,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       var g = grouped.perFloor[f.id];
       var full = slotsOn() ? isFullyBooked(g.full) : (g.full.length>0);
       if(!full) allFull = false;
-      var cardsHtml = g.singles.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id); }).join('');
+      var cardsHtml = g.singles.map(function(b){ return bookingCardHtml(b, f.id, '-af'+f.id, iso); }).join('');
       var openMsg = (!full && g.full.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Open — no booking on this floor.</p>' : '';
       var multiNote = (!full && g.full.length>0 && g.singles.length===0) ? '<p class="hint" style="margin:4px 0 10px;">Booked as part of a multi-floor event — see above.</p>' : '';
       var addBtn = full ? '' : '<button class="btn add block" id="addAll-'+f.id+'">+ Add booking on '+f.label+'</button>';
@@ -1852,7 +1906,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     });
   }
 
-  function bookingCardHtml(b, floorId, idSuffix){
+  function bookingCardHtml(b, floorId, idSuffix, iso){
     idSuffix = idSuffix || '';
     var s = settlementSummary(b);
     var eventLabel = b.eventType === 'Other' ? (b.eventTypeOther || 'Other') : b.eventType;
@@ -1860,10 +1914,22 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var floorsNote = floors.length>1 ? '<div class="bc-event" style="margin-top:2px;">Booked together on: '+combinedFloorLabel(b, floorId)+'</div>' : '';
     var slotBadge = slotLabelOf(b) ? '<span class="bc-slot">'+slotLabelOf(b)+'</span>' : '';
 
-    var settlementPending = b.sdReleased && (s.balance>0 || s.refundDue>0);
-    var balanceOwed = settlementPending && s.refundDue<=0 && s.balance>0;
-    var pillClass = !b.sdReleased ? 'pending' : (balanceOwed ? 'balance-due' : (settlementPending ? 'pending' : 'released'));
-    var pillText = !b.sdReleased ? 'Final billing pending' : (settlementPending ? (s.refundDue>0 ? 'Refund pending' : 'Balance pending') : 'Fully Paid & Settled');
+    // Once final billing is done, balance/refund due always show — those are the real,
+    // final numbers. Before final billing, "Balance due" is only meaningful in the
+    // run-up to the event (up to the day before); once the event day itself arrives,
+    // the workflow shifts to Final Billing (electricity, items, etc.), so the pill
+    // switches to "Final billing pending" even if an original balance is still owed.
+    var isBeforeEventDay = iso ? (todayIso() < iso) : true;
+    var pillClass, pillText;
+    if(b.sdReleased){
+      if(s.balance>0){ pillClass = 'balance-due'; pillText = 'Balance due'; }
+      else if(s.refundDue>0){ pillClass = 'pending'; pillText = 'Refund pending'; }
+      else { pillClass = 'released'; pillText = 'Fully Paid & Settled'; }
+    } else if(s.balance>0 && isBeforeEventDay){
+      pillClass = 'balance-due'; pillText = 'Balance due';
+    } else {
+      pillClass = 'pending'; pillText = 'Final billing pending';
+    }
 
     return '<div class="booking-card">'+
       '<div class="bc-top-row"><span class="bc-pill '+pillClass+'">'+pillText+'</span></div>'+
@@ -1957,6 +2023,16 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       '</div>';
     }).join('') : '<p class="hint" style="margin:0;">No rental items configured yet — add some in Settings.</p>';
 
+    var fixedList = (state.settings && state.settings.fixedCharges) || [];
+    var currentFixed = b.fixedChargesSelected || {};
+    var fixedHtml = fixedList.length ? fixedList.map(function(item){
+      var checked = Object.prototype.hasOwnProperty.call(currentFixed, item.name);
+      return '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:8px;">'+
+        '<input type="checkbox" class="fFixedChk" data-name="'+attr(item.name)+'" data-rate="'+num(item.rate)+'" '+(checked?'checked':'')+' style="width:18px;height:18px;accent-color:var(--teal);flex:none;">'+
+        '<span style="font-size:13.5px;">'+escapeHtml(item.name)+' — ₹'+num(item.rate)+'</span>'+
+      '</label>';
+    }).join('') : '<p class="hint" style="margin:0;">No fixed charges configured yet — add some in Settings.</p>';
+
     modalBoxInner.innerHTML =
       '<div class="modal-head">'+
         '<div><p class="modal-date">'+fmtDateLabel(iso)+' · '+floorLabel(floorId)+'</p>'+
@@ -1976,6 +2052,10 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         itemsHtml+
       '</div>'+
       '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Fixed charges</p>'+
+        fixedHtml+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px;">'+
         '<p class="bc-name" style="margin:0 0 8px;">Penalty</p>'+
         '<p class="hint" style="margin:0 0 8px;">Add a charge here if the customer damaged/broke something and is being penalized for it.</p>'+
         '<div class="field" style="margin-top:0;"><label>Penalty charge (₹)</label><input type="number" id="fPenalty" value="'+attr(b.penalty)+'" placeholder="0" min="0"></div>'+
@@ -1987,6 +2067,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         bcRow('Cleaning Charge', money(b.cleaningCharge), true)+
         '<div id="elecLineWrap"></div>'+
         '<div id="itemLinesWrap"></div>'+
+        '<div id="fixedLineWrap"></div>'+
         '<div id="penaltyLineWrap"></div>'+
         bcRow('Total Charges', '<span id="calcTotalCharges">₹ 0</span>', true)+
         bcRow('S.D. Released', '<span style="color:var(--rose);">− '+money(deposit)+'</span>', true)+
@@ -2009,6 +2090,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var elecOpenEl = document.getElementById('fElecOpen');
     var elecCloseEl = document.getElementById('fElecClose');
     var invInputs = document.querySelectorAll('.fInvQty');
+    var fixedInputs = document.querySelectorAll('.fFixedChk');
     var penaltyEl = document.getElementById('fPenalty');
 
     // netBalance > 0: customer still owes money. netBalance < 0: customer is owed a
@@ -2031,10 +2113,20 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       });
       document.getElementById('itemLinesWrap').innerHTML = itemLinesHtml;
 
+      var fixedTotal = 0;
+      var fixedLinesHtml = '';
+      fixedInputs.forEach(function(chk){
+        if(!chk.checked) return;
+        var rate = num(chk.getAttribute('data-rate'));
+        fixedTotal += rate;
+        fixedLinesHtml += bcRow(escapeHtml(chk.getAttribute('data-name')), money(rate), true);
+      });
+      document.getElementById('fixedLineWrap').innerHTML = fixedLinesHtml;
+
       var penaltyAmt = num(penaltyEl ? penaltyEl.value : 0);
       document.getElementById('penaltyLineWrap').innerHTML = penaltyAmt>0 ? bcRow('Penalty', money(penaltyAmt), true) : '';
 
-      var totalCharges = num(b.totalAmount) + num(b.cleaningCharge) + elecCharge + invTotal + penaltyAmt;
+      var totalCharges = num(b.totalAmount) + num(b.cleaningCharge) + elecCharge + invTotal + fixedTotal + penaltyAmt;
       document.getElementById('calcTotalCharges').textContent = money(totalCharges);
 
       var refundsPaid = num(b.refundsPaid||0);
@@ -2072,6 +2164,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     elecOpenEl.addEventListener('input', recalc);
     elecCloseEl.addEventListener('input', recalc);
     invInputs.forEach(function(inp){ inp.addEventListener('input', recalc); });
+    fixedInputs.forEach(function(chk){ chk.addEventListener('change', recalc); });
     if(penaltyEl) penaltyEl.addEventListener('input', recalc);
     recalc();
 
@@ -2091,11 +2184,21 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         if(qty>0){ invQuantities[name] = qty; invRates[name] = rate; }
       });
 
+      var fixedTotal = 0;
+      var fixedSelected = {};
+      fixedInputs.forEach(function(chk){
+        if(!chk.checked) return;
+        var name = chk.getAttribute('data-name');
+        var rate = num(chk.getAttribute('data-rate'));
+        fixedTotal += rate;
+        fixedSelected[name] = rate;
+      });
+
       var penaltyAmt = num(document.getElementById('fPenalty') ? document.getElementById('fPenalty').value : 0);
 
       // Work out whether the "amount just now" entered should be treated as a fresh
       // collection or a fresh refund, based on the outstanding position at save time.
-      var totalCharges = num(b.totalAmount) + num(b.cleaningCharge) + elecCharge + invTotal + penaltyAmt;
+      var totalCharges = num(b.totalAmount) + num(b.cleaningCharge) + elecCharge + invTotal + fixedTotal + penaltyAmt;
       var refundsPaidSoFar = num(b.refundsPaid||0);
       var netBalance = (totalCharges - deposit - paidExclSd) + refundsPaidSoFar;
       var settleInput = document.getElementById('fSettleAmount');
@@ -2119,6 +2222,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       b.inventoryCharges = invTotal;
       b.inventoryQuantities = invQuantities;
       b.inventoryRates = invRates;
+      b.fixedChargesTotal = fixedTotal;
+      b.fixedChargesSelected = fixedSelected;
       b.penalty = penaltyAmt;
       b.penaltyReason = (document.getElementById('fPenaltyReason') ? document.getElementById('fPenaltyReason').value.trim() : '');
 
@@ -2196,10 +2301,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       '<div class="field"><label>Mobile number</label><input type="tel" id="fMobile" value="'+attr(b.mobile)+'" placeholder="10-digit mobile number"></div>'+
       '<div class="field"><label>Address</label><textarea id="fAddress" rows="2" placeholder="Full address">'+(b.address||'')+'</textarea></div>'+
       '<div id="floorChargeContainer" class="field" style="margin-top:14px;"></div>'+
-      '<div class="row2" style="margin-top:14px;">'+
-        '<div class="field" style="margin-top:0;"><label>Cleaning charge (₹)</label><input type="number" id="fCleaningCharge" value="'+attr(b.cleaningCharge)+'" placeholder="0"></div>'+
-        '<div class="field" style="margin-top:0;"><label>Deposit (₹)</label><input type="number" id="fSdAmount" value="'+attr(b.sdAmount)+'" placeholder="0"></div>'+
-      '</div>'+
+      '<div class="field" style="margin-top:14px;"><label>Cleaning charge (₹)</label><input type="number" id="fCleaningCharge" value="'+attr(b.cleaningCharge)+'" placeholder="0"></div>'+
+      '<div class="field"><label>Deposit (₹)</label><input type="number" id="fSdAmount" value="'+attr(b.sdAmount)+'" placeholder="0"></div>'+
       '<div class="field"><label>Total (₹)</label><input type="text" id="fGrandTotalDisplay" value="0" readonly style="opacity:0.8;font-weight:bold;background:#e2dcc8;"></div>'+
       (isEdit ? '' : '<p class="hint" id="autoFillHint" style="margin-top:6px;">Floor charges, cleaning charge, and deposit are filled in from your saved default rates — feel free to adjust.</p>')+
       '<div class="field"><label>Amount paid (₹)</label><input type="number" id="fAmountPaid" value="'+attr(b.amountPaid)+'" placeholder="0"></div>'+
@@ -2438,6 +2541,8 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         inventoryCharges: b.inventoryCharges || 0,
         inventoryQuantities: b.inventoryQuantities || {},
         inventoryRates: b.inventoryRates || {},
+        fixedChargesTotal: b.fixedChargesTotal || 0,
+        fixedChargesSelected: b.fixedChargesSelected || {},
         refundsPaid: b.refundsPaid || 0,
         refundsPaidDate: b.refundsPaidDate || '',
         extraCollected: b.extraCollected || 0
@@ -2897,11 +3002,32 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     return getItemNames().map(function(name){ return { id:'item:'+name, label:name+' (on rent)' }; });
   }
 
+  // Same idea as getItemNames, but for the flat 24hr Fixed Charges (e.g. Generator
+  // Charges) instead of quantity-based rental items.
+  function getFixedChargeNames(){
+    var names = [], seen = {};
+    ((state.settings && state.settings.fixedCharges)||[]).forEach(function(it){
+      if(it.name && !seen[it.name]){ seen[it.name]=true; names.push(it.name); }
+    });
+    uniqueBookingsFlat().forEach(function(item){
+      var sel = item.b.fixedChargesSelected;
+      if(sel) Object.keys(sel).forEach(function(name){
+        if(name && !seen[name]){ seen[name]=true; names.push(name); }
+      });
+    });
+    return names;
+  }
+
+  function getFixedChargeLedgerHeads(){
+    return getFixedChargeNames().map(function(name){ return { id:'fixed:'+name, label:name+' (fixed charge)' }; });
+  }
+
   // Full ordered list of ledger heads for the Accounts "View" dropdown: the fixed
-  // heads, with one ledger per distinct inventory item slotted in between deposit
-  // and electricity (replacing the old single combined "Items on rent" line).
+  // heads, with one ledger per distinct inventory item and per distinct fixed charge
+  // slotted in between deposit and electricity (replacing the old single combined
+  // "Items on rent" line).
   function allLedgerHeads(){
-    return LEDGER_HEADS_PRE.concat(getItemLedgerHeads()).concat(LEDGER_HEADS_POST);
+    return LEDGER_HEADS_PRE.concat(getItemLedgerHeads()).concat(getFixedChargeLedgerHeads()).concat(LEDGER_HEADS_POST);
   }
 
   function ledgerHeadInfo(id){
@@ -2960,6 +3086,13 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         var wantedName = head.slice(5);
         var line = inventoryItemLines(b).find(function(l){ return l.name===wantedName; });
         if(line && line.amount>0) entries.push({ iso:item.iso, name:b.name, floorLabel:item.floorLabel, amount:line.amount });
+        return;
+      }
+      if(head.indexOf('fixed:')===0){
+        if(floorFilter!=='all' && floors.indexOf(floorFilter)===-1) return;
+        var wantedFixedName = head.slice(6);
+        var fline = fixedChargeLines(b).find(function(l){ return l.name===wantedFixedName; });
+        if(fline && fline.amount>0) entries.push({ iso:item.iso, name:b.name, floorLabel:item.floorLabel, amount:fline.amount });
         return;
       }
       if(floorFilter!=='all' && floors.indexOf(floorFilter)===-1) return;
@@ -3106,7 +3239,6 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var firstOfMonth = today.slice(0,8)+'01';
     panel.innerHTML =
       '<div class="field" style="margin-top:0;"><label>View</label><select id="acctView">'+
-        '<option value="summary">Summary</option>'+
         '<option value="cashbook">Cash account (Receipts / Payments)</option>'+
         allLedgerHeads().map(function(h){ return '<option value="'+h.id+'">'+h.label+'</option>'; }).join('')+
       '</select></div>'+
@@ -3194,10 +3326,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         acctCard('sd-released','Security deposit settled (billed)', money(acc.sdReleased), 'deposit')+
         acctCard('balance-due','Still due from customers', money(acc.balanceDue), 'balance-due')+
       '</div>'+
-      (floorFilter==='all'
-        ? '<div class="booking-card" style="margin-top:14px;"><p class="hint" style="margin:0 0 4px;">Cash received by floor</p>'+renderFloorBreakdown(fromIso,toIso)+'</div>'
-        : '')+
-      '<p class="hint">"Total cash balance" is simply every payment recorded (amount paid already includes any deposit collected up front). "Security deposit collected/settled" is a breakdown of how much of that cash is deposit money — collected but not yet added again, so it won\u2019t inflate the total above. "Still due from customers" is money owed to you, separate from cash already in hand. A booking that covers more than one floor is counted once in the total above, but appears under each floor it covers in the breakdown below. Tap any card above to open its account, or switch "View" above to see individual ledgers for each charge head.</p>';
+      '<p class="hint">"Total cash balance" is simply every payment recorded (amount paid already includes any deposit collected up front). "Security deposit collected/settled" is a breakdown of how much of that cash is deposit money — collected but not yet added again, so it won\u2019t inflate the total above. "Still due from customers" is money owed to you, separate from cash already in hand. A booking that covers more than one floor is counted once in the total above. Tap any card above to open its account, or switch "View" above to see individual ledgers for each charge head.</p>';
 
     el.querySelectorAll('.acct-card.clickable').forEach(function(card){
       card.onclick = function(){ goToLedgerView(card.getAttribute('data-target')); };
@@ -3272,7 +3401,15 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var byWord = head==='refunds' ? 'paid out' : (head==='balance-due' ? 'owed' : 'recorded');
     var rowsHtml = ledger.entries.length
       ? ledger.entries.map(function(e){
-          return '<div class="bc-row"><span class="k">'+fmtDateLabel(e.iso).split(',').slice(0,2).join(',')+' · '+escapeHtml(e.name)+' ('+e.floorLabel+')</span><span class="v mono">'+money(e.amount)+'</span></div>';
+          var fullDate = fmtDateLabel(e.iso);
+          var commaIdx = fullDate.indexOf(',');
+          var weekday = commaIdx>-1 ? fullDate.slice(0,commaIdx) : '';
+          var dateOnly = commaIdx>-1 ? fullDate.slice(commaIdx+1).trim() : fullDate;
+          return '<div class="ledger-row">'+
+            '<div class="lr-col lr-date"><span class="lr-main">'+dateOnly+'</span><span class="lr-sub">'+weekday+'</span></div>'+
+            '<div class="lr-col lr-name"><span class="lr-main">'+escapeHtml(e.name)+'</span><span class="lr-sub">('+e.floorLabel+')</span></div>'+
+            '<div class="lr-col lr-amt">'+money(e.amount)+'</div>'+
+          '</div>';
         }).join('')
       : '<p class="hint" style="margin:0;">No entries for this ledger in the selected filters.</p>';
     var openingHtml = ledger.hasOpening
@@ -3304,9 +3441,20 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
 
   function cashRow(e, side){
     var deleteBtn = e.manual ? '<button class="cb-del" data-id="'+e.id+'" title="Delete entry">&times;</button>' : '';
-    return '<div class="bc-row cb-row">'+
-      '<span class="k">'+fmtDateLabel(e.iso).split(',').slice(0,2).join(',')+' · '+escapeHtml(e.label)+'</span>'+
-      '<span class="v mono cb-amt-'+side+'">'+money(e.amount)+deleteBtn+'</span>'+
+    var fullDate = fmtDateLabel(e.iso);
+    var commaIdx = fullDate.indexOf(',');
+    var weekday = commaIdx>-1 ? fullDate.slice(0,commaIdx) : '';
+    var dateOnly = commaIdx>-1 ? fullDate.slice(commaIdx+1).trim() : fullDate;
+    // Most labels end in "... (Floor)" — split that off into a sub-line, same as the
+    // ledger "by booking" rows, so the layout matches. Labels without a trailing
+    // "(...)" (e.g. manual cash payments) just show as a single line.
+    var mainLabel = e.label, subLabel = '';
+    var m = /^(.*)\s\(([^)]+)\)$/.exec(e.label);
+    if(m){ mainLabel = m[1]; subLabel = '('+m[2]+')'; }
+    return '<div class="ledger-row cb-ledger-row">'+
+      '<div class="lr-col lr-date"><span class="lr-main">'+dateOnly+'</span><span class="lr-sub">'+weekday+'</span></div>'+
+      '<div class="lr-col lr-name"><span class="lr-main">'+escapeHtml(mainLabel)+'</span>'+(subLabel?'<span class="lr-sub">'+escapeHtml(subLabel)+'</span>':'')+'</div>'+
+      '<div class="lr-col lr-amt-wrap"><span class="lr-amt cb-amt-'+side+'">'+money(e.amount)+'</span>'+deleteBtn+'</div>'+
     '</div>';
   }
 
@@ -3822,6 +3970,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
     var pkgThree = (state.settings && state.settings.packageThreeFloorsDeposit) || '';
     var elecRate = (state.settings && state.settings.elecRate) || '';
     var workingItems = ((state.settings && state.settings.inventoryItems) || []).map(function(it){ return { name: it.name, rate: it.rate }; });
+    var workingFixedCharges = ((state.settings && state.settings.fixedCharges) || []).map(function(it){ return { name: it.name, rate: it.rate }; });
 
     panel.innerHTML =
       '<div class="booking-card" style="margin-top:0; display:none;">'+
@@ -3856,6 +4005,11 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
         '<button type="button" class="btn ghost" id="addItemBtn" style="margin-top:10px;">+ Add item</button>'+
       '</div>'+
       '<div class="booking-card" style="margin-top:10px;">'+
+        '<p class="bc-name" style="margin:0 0 8px;">Fixed charges</p>'+
+        '<div id="fixedChargesList"></div>'+
+        '<button type="button" class="btn ghost" id="addFixedChargeBtn" style="margin-top:10px;">+ Add fixed charge</button>'+
+      '</div>'+
+      '<div class="booking-card" style="margin-top:10px;">'+
         '<p class="bc-name" style="margin:0 0 8px;">Electricity</p>'+
         '<div class="field" style="margin-top:0;"><label>Rate per unit (₹)</label><input type="number" id="set-elecRate" value="'+attr(elecRate)+'" placeholder="e.g. 10"></div>'+
       '</div>'+
@@ -3886,6 +4040,31 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       renderRentalItemsList();
     };
 
+    function fixedChargeRowHtml(item, idx){
+      return '<div class="item-row" data-idx="'+idx+'">'+
+        '<input type="text" class="item-name" placeholder="Charge name (e.g. Generator Charges)" value="'+attr(item.name)+'">'+
+        '<input type="number" class="item-rate" placeholder="Rate ₹" value="'+attr(item.rate)+'">'+
+        '<button type="button" class="btn danger item-remove" title="Remove">&times;</button>'+
+      '</div>';
+    }
+
+    function renderFixedChargesList(){
+      var el = document.getElementById('fixedChargesList');
+      el.innerHTML = workingFixedCharges.length ? workingFixedCharges.map(fixedChargeRowHtml).join('') : '<p class="hint" style="margin:0;">No fixed charges added yet.</p>';
+      el.querySelectorAll('.item-row').forEach(function(row){
+        var idx = parseInt(row.getAttribute('data-idx'),10);
+        row.querySelector('.item-name').addEventListener('input', function(){ workingFixedCharges[idx].name = this.value; });
+        row.querySelector('.item-rate').addEventListener('input', function(){ workingFixedCharges[idx].rate = this.value; });
+        row.querySelector('.item-remove').onclick = function(){ workingFixedCharges.splice(idx,1); renderFixedChargesList(); };
+      });
+    }
+    renderFixedChargesList();
+
+    document.getElementById('addFixedChargeBtn').onclick = function(){
+      workingFixedCharges.push({ name:'', rate:'' });
+      renderFixedChargesList();
+    };
+
     document.getElementById('setSlotsEnabled').onchange = function(){
       var checked = this.checked;
       FLOORS.forEach(function(f){
@@ -3907,6 +4086,9 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       newSettings.packageTwoFloorsDeposit = document.getElementById('set-pkg-two').value.trim();
       newSettings.packageThreeFloorsDeposit = document.getElementById('set-pkg-three').value.trim();
       newSettings.inventoryItems = workingItems
+        .filter(function(it){ return (it.name||'').trim()!==''; })
+        .map(function(it){ return { name: (it.name||'').trim(), rate: (it.rate!=null?String(it.rate).trim():'') }; });
+      newSettings.fixedCharges = workingFixedCharges
         .filter(function(it){ return (it.name||'').trim()!==''; })
         .map(function(it){ return { name: (it.name||'').trim(), rate: (it.rate!=null?String(it.rate).trim():'') }; });
       newSettings.elecRate = document.getElementById('set-elecRate').value.trim();
@@ -3932,7 +4114,7 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
   function downloadCsv(){
     var rows = [[
       'Floor','Date','Slot','Event','Name','Mobile','Address','Floor Charges','Floor Charges Breakdown','Cleaning Charge','Security Deposit',
-      'Items Used','Items Total','Electricity Opening','Electricity Closing','Electricity Charge','Penalty','Penalty Reason',
+      'Items Used','Items Total','Fixed Charges','Fixed Charges Total','Electricity Opening','Electricity Closing','Electricity Charge','Penalty','Penalty Reason',
       'Total Configuration','Amount Paid At Booking','Extra Collected (Final Billing)','Total Amount Paid','Balance Due','Refund Due To Customer','Refund Paid To Customer','Payment Details',
       'Billing Complete','Billing Processed On','Billing Notes'
     ]];
@@ -3944,11 +4126,12 @@ h1{ font-family:'Marcellus', serif; font-size:clamp(20px,4vw,30px); margin:0; fo
       var refundDue = refundDueOf(b);
       var deposit = depositDisplayOf(b);
       var itemsDesc = inventoryItemsDesc(b);
+      var fixedDesc = fixedChargesDesc(b);
       var floorBreakdownDesc = floorChargeBreakdown(b, item.floorIds[0]).map(function(r){ return r.label+': '+money(r.amount); }).join(', ');
       rows.push([
         item.floorLabel, item.iso, slotLabelOf(b)||'', eventLabel, b.name, b.mobile, b.address||'',
         num(b.totalAmount), floorBreakdownDesc, num(b.cleaningCharge), deposit,
-        itemsDesc, num(b.inventoryCharges), num(b.elecOpen), num(b.elecClose), num(b.elecCharges), num(b.penalty), b.penaltyReason||'',
+        itemsDesc, num(b.inventoryCharges), fixedDesc, num(b.fixedChargesTotal), num(b.elecOpen), num(b.elecClose), num(b.elecCharges), num(b.penalty), b.penaltyReason||'',
         total, num(b.amountPaid), num(b.extraCollected||0), totalPaidOf(b), balance, refundDue, num(b.refundsPaid||0), b.paymentDetails||'',
         b.sdReleased?'Yes':'No', b.sdReleaseDate||'', b.sdReleaseNotes||''
       ]);
